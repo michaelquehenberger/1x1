@@ -1,11 +1,604 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>1x1 Fußball-Arena: Ilian vs. Johan</title>
+    <style>
+        :root {
+            --grass-dark: #1b5e20;
+            --grass-light: #2e7d32;
+            --gold: #ffd700;
+            --white: #ffffff;
+            --blue-team: #0288d1;
+            --red-team: #d32f2f;
+            --dark-bg: #121212;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--grass-dark),
+                var(--grass-dark) 40px,
+                var(--grass-light) 40px,
+                var(--grass-light) 80px
+            );
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stadium-card {
+            background: rgba(18, 25, 35, 0.92);
+            border: 4px solid var(--gold);
+            border-radius: 24px;
+            padding: 25px;
+            width: 95%;
+            max-width: 750px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.2rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #cfd8dc;
+            margin-bottom: 20px;
+        }
+
+        /* Setup Screen */
+        .setup-section {
+            margin-bottom: 20px;
+        }
+
+        .player-setup {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .player-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 15px;
+            flex: 1;
+            min-width: 240px;
+            border: 2px solid transparent;
+        }
+
+        .player-card.ilian { border-color: var(--blue-team); }
+        .player-card.johan { border-color: var(--red-team); }
+
+        .player-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.4rem;
+        }
+
+        select, button {
+            font-size: 1.1rem;
+            padding: 10px 16px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.15s, background 0.2s;
+        }
+
+        select {
+            width: 100%;
+            background: #263238;
+            color: white;
+            border: 2px solid #546e7a;
+            margin-top: 5px;
+        }
+
+        .level-buttons, .mode-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 10px 0 20px 0;
+        }
+
+        .choice-btn {
+            background: #37474f;
+            color: #eceff1;
+            border: 2px solid #546e7a;
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .choice-btn.active {
+            background: var(--gold);
+            color: #000;
+            border-color: #fff;
+            transform: scale(1.03);
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, #00c853, #64dd17);
+            color: #000;
+            font-size: 1.5rem;
+            padding: 15px 40px;
+            border-radius: 50px;
+            box-shadow: 0 6px 0 #1b5e20;
+            margin-top: 10px;
+        }
+
+        .start-btn:hover { transform: translateY(-2px); }
+        .start-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #1b5e20; }
+
+        /* Scoreboard */
+        .scoreboard {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #000;
+            border: 3px solid #455a64;
+            border-radius: 16px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+        }
+
+        .team-score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 38%;
+            padding: 8px;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .team-score.active-turn {
+            background: rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 15px var(--gold);
+            transform: scale(1.05);
+        }
+
+        .team-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .star-badge {
+            font-size: 0.85rem;
+            color: #b0bec5;
+        }
+
+        .goals {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--gold);
+        }
+
+        .vs-box {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #90a4ae;
+        }
+
+        /* Pitch & Math Area */
+        .turn-banner {
+            font-size: 1.4rem;
+            font-weight: bold;
+            padding: 8px 20px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .turn-ilian { background: var(--blue-team); }
+        .turn-johan { background: var(--red-team); }
+
+        .math-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .question {
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            margin: 10px 0;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .ans-btn {
+            background: #eceff1;
+            color: #102027;
+            font-size: 2rem;
+            padding: 18px;
+            border-radius: 16px;
+            box-shadow: 0 5px 0 #90a4ae;
+        }
+
+        .ans-btn:hover { background: #ffffff; transform: translateY(-2px); }
+        .ans-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #90a4ae; }
+        .ans-btn.correct { background: #00e676 !important; color: #000; box-shadow: 0 5px 0 #00a152; }
+        .ans-btn.wrong { background: #ff1744 !important; color: #fff; box-shadow: 0 5px 0 #b2102f; }
+
+        .feedback-overlay {
+            font-size: 1.6rem;
+            font-weight: bold;
+            min-height: 40px;
+            margin-top: 15px;
+        }
+
+        .ball-anim {
+            font-size: 3rem;
+            display: inline-block;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .goal-scored {
+            transform: scale(1.6) rotate(360deg);
+        }
+
+        /* End Screen */
+        .trophy { font-size: 5rem; margin: 10px 0; }
+        .winner-text { font-size: 2.2rem; color: var(--gold); font-weight: bold; margin-bottom: 10px; }
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
-    
+
+<div class="stadium-card">
+    <!-- STARTBILDSCHIRM -->
+    <div id="setup-screen">
+        <h1>⚽ 1x1 Champions Arena ⚽</h1>
+        <div class="subtitle">2. Klasse Volksschule – Ilian & Johan</div>
+
+        <div class="player-setup">
+            <div class="player-card ilian">
+                <h3>🔵 Ilian</h3>
+                <label>Wähle deinen Kapitän:</label>
+                <select id="star-ilian">
+                    <option value="Lionel Messi 🐐">Lionel Messi 🐐</option>
+                    <option value="Kylian Mbappé ⚡">Kylian Mbappé ⚡</option>
+                    <option value="Erling Haaland 🤖">Erling Haaland 🤖</option>
+                    <option value="Lamine Yamal 🌟">Lamine Yamal 🌟</option>
+                    <option value="David Alaba 🇦🇹">David Alaba 🇦🇹</option>
+                </select>
+            </div>
+
+            <div class="player-card johan">
+                <h3>🔴 Johan</h3>
+                <label>Wähle deinen Kapitän:</label>
+                <select id="star-johan">
+                    <option value="Cristiano Ronaldo 🚀">Cristiano Ronaldo 🚀</option>
+                    <option value="Jude Bellingham 👑">Jude Bellingham 👑</option>
+                    <option value="Vinícius Júnior 🔥">Vinícius Júnior 🔥</option>
+                    <option value="Jamal Musiala ✨">Jamal Musiala ✨</option>
+                    <option value="Marko Arnautović 🇦🇹">Marko Arnautović 🇦🇹</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="setup-section">
+            <strong>1. Schwierigkeitsstufe (2. Klasse):</strong>
+            <div class="level-buttons" id="level-group">
+                <button class="choice-btn active" data-val="1">🥉 Rookie<br><small>1er, 2er, 5er, 10er</small></button>
+                <button class="choice-btn" data-val="2">🥈 Profi<br><small>+ 3er & 4er Reihe</small></button>
+                <button class="choice-btn" data-val="3">🥇 Weltmeister<br><small>Alle 1x1 Reihen</small></button>
+            </div>
+        </div>
+
+        <div class="setup-section">
+            <strong>2. Spielmodus:</strong>
+            <div class="mode-buttons" id="mode-group">
+                <button class="choice-btn active" data-val="versus">⚔️ Elfmeter-Duell (1 vs 1)</button>
+                <button class="choice-btn" data-val="coop">🤝 Team-Pokal (Gemeinsam)</button>
+            </div>
+        </div>
+
+        <button class="start-btn" onclick="startGame()">ANPFIFF! 🏟️</button>
+    </div>
+
+    <!-- SPIELBILDSCHIRM -->
+    <div id="game-screen" class="hidden">
+        <!-- Scoreboard für Duell -->
+        <div id="scoreboard-versus" class="scoreboard">
+            <div class="team-score" id="card-p1">
+                <span class="team-name">🔵 Ilian</span>
+                <span class="star-badge" id="badge-p1">Messi</span>
+                <span class="goals" id="score-p1">0</span>
+            </div>
+            <div class="vs-box">
+                <div>Runde <span id="round-num">1</span> / 10</div>
+                <div style="font-size: 1.5rem; margin-top:4px;">⚽</div>
+            </div>
+            <div class="team-score" id="card-p2">
+                <span class="team-name">🔴 Johan</span>
+                <span class="star-badge" id="badge-p2">Ronaldo</span>
+                <span class="goals" id="score-p2">0</span>
+            </div>
+        </div>
+
+        <!-- Scoreboard für Team-Modus -->
+        <div id="scoreboard-coop" class="scoreboard hidden">
+            <div class="team-score" style="width: 60%;">
+                <span class="team-name">🔵🔴 Team Ilian & Johan</span>
+                <span class="star-badge" id="badge-coop">Dreamteam</span>
+            </div>
+            <div class="team-score" style="width: 35%;">
+                <span class="team-name">Tore (Ziel: 10)</span>
+                <span class="goals" id="score-coop">0</span>
+            </div>
+        </div>
+
+        <div id="turn-indicator" class="turn-banner turn-ilian">Ilian ist am Ball!</div>
+
+        <div class="math-box">
+            <div class="ball-anim" id="soccer-ball">⚽</div>
+            <div class="question" id="question-text">2 × 5 = ?</div>
+            <div class="answers-grid" id="answers-container"></div>
+            <div class="feedback-overlay" id="feedback-text"></div>
+        </div>
+    </div>
+
+    <!-- ENDBILDSCHIRM -->
+    <div id="end-screen" class="hidden">
+        <div class="trophy">🏆</div>
+        <div class="winner-text" id="winner-headline">Sieg!</div>
+        <p id="final-stats" style="font-size: 1.3rem; margin-bottom: 25px;"></p>
+        <button class="start-btn" onclick="resetToMenu()">REVANCHE! 🔄</button>
+    </div>
+</div>
+
+<script>
+    let level = 1;
+    let mode = 'versus'; // 'versus' oder 'coop'
+    let currentPlayer = 1; // 1 = Ilian, 2 = Johan
+    let scores = { 1: 0, 2: 0, coop: 0 };
+    let turnsPlayed = 0;
+    const maxTurnsVersus = 20; // 10 Schüsse pro Spieler
+    const targetCoopGoals = 10;
+    let currentAnswer = 0;
+    let isLocked = false;
+
+    // Auswahl-Buttons aktivieren
+    document.querySelectorAll('#level-group .choice-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#level-group .choice-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            level = parseInt(btn.dataset.val);
+        });
+    });
+
+    document.querySelectorAll('#mode-group .choice-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#mode-group .choice-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            mode = btn.dataset.val;
+        });
+    });
+
+    function startGame() {
+        scores = { 1: 0, 2: 0, coop: 0 };
+        turnsPlayed = 0;
+        currentPlayer = 1;
+        isLocked = false;
+
+        const star1 = document.getElementById('star-ilian').value;
+        const star2 = document.getElementById('star-johan').value;
+
+        document.getElementById('badge-p1').innerText = star1;
+        document.getElementById('badge-p2').innerText = star2;
+        document.getElementById('badge-coop').innerText = star1 + " & " + star2;
+
+        document.getElementById('setup-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+
+        if (mode === 'versus') {
+            document.getElementById('scoreboard-versus').classList.remove('hidden');
+            document.getElementById('scoreboard-coop').classList.add('hidden');
+        } else {
+            document.getElementById('scoreboard-versus').classList.add('hidden');
+            document.getElementById('scoreboard-coop').classList.remove('hidden');
+        }
+
+        updateUI();
+        generateQuestion();
+    }
+
+    function getAllowedTables() {
+        // Typischer Stoff der 2. Klasse Volksschule Österreich
+        if (level === 1) return [1, 2, 5, 10]; // Kernaufgaben
+        if (level === 2) return [1, 2, 3, 4, 5, 10]; // Erweiterung
+        return [2, 3, 4, 5, 6, 7, 8, 9, 10]; // Alle Reihen (ohne 1er damit es spannend bleibt)
+    }
+
+    function generateQuestion() {
+        isLocked = false;
+        document.getElementById('feedback-text').innerText = '';
+        document.getElementById('soccer-ball').classList.remove('goal-scored');
+
+        const tables = getAllowedTables();
+        const table = tables[Math.floor(Math.random() * tables.length)];
+        const multiplier = Math.floor(Math.random() * 10) + 1;
+
+        // Zufällig tauschen (z.B. 3x5 oder 5x3)
+        const swap = Math.random() > 0.5;
+        const a = swap ? table : multiplier;
+        const b = swap ? multiplier : table;
+
+        currentAnswer = a * b;
+        document.getElementById('question-text').innerText = `${a} × ${b} = ?`;
+
+        // 3 plausible Falschantworten erzeugen
+        let options = new Set([currentAnswer]);
+        while (options.size < 4) {
+            let offset = (Math.floor(Math.random() * 5) - 2) * (Math.random() > 0.5 ? table : 1);
+            if (offset === 0) offset = Math.floor(Math.random() * 4) + 1;
+            let wrong = currentAnswer + offset;
+            if (wrong > 0 && wrong !== currentAnswer) {
+                options.add(wrong);
+            }
+        }
+
+        // Mischen und Buttons bauen
+        const shuffled = Array.from(options).sort(() => Math.random() - 0.5);
+        const container = document.getElementById('answers-container');
+        container.innerHTML = '';
+
+        shuffled.forEach(num => {
+            const btn = document.createElement('button');
+            btn.className = 'ans-btn';
+            btn.innerText = num;
+            btn.onclick = () => checkAnswer(num, btn);
+            container.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected, btnElement) {
+        if (isLocked) return;
+        isLocked = true;
+
+        const playerName = currentPlayer === 1 ? "Ilian" : "Johan";
+        const starName = currentPlayer === 1 
+            ? document.getElementById('star-ilian').value.split(' ')[1] 
+            : document.getElementById('star-johan').value.split(' ')[1];
+
+        const feedback = document.getElementById('feedback-text');
+        const ball = document.getElementById('soccer-ball');
+
+        if (selected === currentAnswer) {
+            btnElement.classList.add('correct');
+            ball.classList.add('goal-scored');
+            const cheers = [
+                `TOOOOR! Traumschuss von ${playerName}! ⚽🔥`,
+                `WELTKLASSE! Genau wie ${starName}! 🌟`,
+                `UNHALTBAR ins Kreuzeck, ${playerName}! 🚀`,
+                `SUPER GEMACHT! Ein echtes Traumtor! 🎉`
+            ];
+            feedback.innerText = cheers[Math.floor(Math.random() * cheers.length)];
+            feedback.style.color = '#00e676';
+
+            if (mode === 'versus') {
+                scores[currentPlayer]++;
+            } else {
+                scores.coop++;
+            }
+        } else {
+            btnElement.classList.add('wrong');
+            // Richtige Lösung grün markieren
+            document.querySelectorAll('.ans-btn').forEach(b => {
+                if (parseInt(b.innerText) === currentAnswer) b.classList.add('correct');
+            });
+            feedback.innerText = `Knapp vorbei! Richtig wäre ${currentAnswer} gewesen. 🧤`;
+            feedback.style.color = '#ff8a80';
+        }
+
+        turnsPlayed++;
+        updateUI();
+
+        setTimeout(() => {
+            if (checkGameOver()) {
+                showEndScreen();
+            } else {
+                currentPlayer = currentPlayer === 1 ? 2 : 1;
+                updateUI();
+                generateQuestion();
+            }
+        }, 1800);
+    }
+
+    function updateUI() {
+        document.getElementById('score-p1').innerText = scores[1];
+        document.getElementById('score-p2').innerText = scores[2];
+        document.getElementById('score-coop').innerText = scores.coop;
+
+        const round = Math.min(10, Math.floor(turnsPlayed / 2) + 1);
+        document.getElementById('round-num').innerText = round;
+
+        const banner = document.getElementById('turn-indicator');
+        const card1 = document.getElementById('card-p1');
+        const card2 = document.getElementById('card-p2');
+
+        if (currentPlayer === 1) {
+            banner.innerText = "🔵 Ilian ist am Ball!";
+            banner.className = "turn-banner turn-ilian";
+            card1.classList.add('active-turn');
+            card2.classList.remove('active-turn');
+        } else {
+            banner.innerText = "🔴 Johan ist am Ball!";
+            banner.className = "turn-banner turn-johan";
+            card2.classList.add('active-turn');
+            card1.classList.remove('active-turn');
+        }
+    }
+
+    function checkGameOver() {
+        if (mode === 'versus') {
+            return turnsPlayed >= maxTurnsVersus;
+        } else {
+            return scores.coop >= targetCoopGoals;
+        }
+    }
+
+    function showEndScreen() {
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
+
+        const headline = document.getElementById('winner-headline');
+        const stats = document.getElementById('final-stats');
+
+        if (mode === 'versus') {
+            if (scores[1] > scores[2]) {
+                headline.innerText = "🏆 ILIAN GEWINNT DEN POKAL! 🏆";
+            } else if (scores[2] > scores[1]) {
+                headline.innerText = "🏆 JOHAN GEWINNT DEN POKAL! 🏆";
+            } else {
+                headline.innerText = "🤝 UNENTSCHIEDEN! BEIDE SIND CHAMPIONS! 🤝";
+            }
+            stats.innerText = `Endstand: Ilian ${scores[1]} : ${scores[2]} Johan`;
+        } else {
+            headline.innerText = "🏆 TEAM-WELTMEISTER! 🏆";
+            stats.innerText = `Ilian & Johan haben gemeinsam 10 Tore in ${turnsPlayed} Versuchen geschossen!`;
+        }
+    }
+
+    function resetToMenu() {
+        document.getElementById('end-screen').classList.add('hidden');
+        document.getElementById('setup-screen').classList.remove('hidden');
+    }
+</script>
+
 </body>
 </html>
