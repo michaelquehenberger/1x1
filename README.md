@@ -1,6 +1,6 @@
 # ⚽ 1x1 Champions Arena
 
-Ein Fußball-Lernspiel für das kleine Einmaleins (2. Klasse Volksschule) – für zwei Kinder, Ilian und Johan.
+Ein Fußball-Lernspiel für das kleine Einmaleins (2. Klasse Volksschule) – für Ilian, Johan und Helena, allein oder gemeinsam.
 
 ## ▶️ Jetzt spielen
 
@@ -14,27 +14,46 @@ Das Spiel läuft direkt im Browser, auf PC, Tablet und Handy. Man braucht keine 
 
 ## 🎮 So wird gespielt
 
-1. **Kapitän wählen:** Jedes Kind sucht sich seinen Lieblingsspieler aus.
+1. **Wer spielt mit?** Ilian 🔵, Johan 🔴 und/oder Helena 🟣 mit **➕ Mitspielen** auswählen. Es können 1, 2 oder alle 3 Kinder spielen.
+   - **📷 Foto:** Jedes Kind kann ein eigenes Foto auswählen. Es erscheint auf der Anzeigetafel und wenn das Kind am Ball ist.
+   - **Kapitän:** Jedes Kind wählt seinen Lieblingsstar.
 2. **Schwierigkeitsstufe wählen:**
 
-   | Stufe | Einmaleins-Reihen |
-   |---|---|
-   | 🥉 Rookie | 1er, 2er, 5er, 10er |
-   | 🥈 Profi | 1er, 2er, 3er, 4er, 5er, 10er |
-   | 🥇 Weltmeister | 2er bis 10er (alle Reihen) |
+   | Stufe | Einmaleins-Reihen | Freischalten |
+   |---|---|---|
+   | 🥉 Rookie | 1er, 2er, 5er, 10er | von Anfang an offen |
+   | 🥈 Profi | 1er, 2er, 3er, 4er, 5er, 10er | 2× Rookie geschafft |
+   | 🥇 Weltmeister | 2er bis 10er (alle Reihen) | 2× Profi geschafft |
 
+   **⭐ Geschafft** = mindestens 7 von 10 Aufgaben richtig (im Team-Pokal: ca. 7 von 10 Schüssen sind Tore, also z.B. 10 Tore in höchstens 15 Versuchen).
+   Jedes Kind sammelt **eigene Sterne**. Spielen mehrere Kinder zusammen, ist eine Stufe nur wählbar, wenn **alle** sie schon freigespielt haben. Gesperrte Stufen zeigen 🔒 und wie viele Sterne noch fehlen.
 3. **Spielmodus wählen:**
-   - ⚔️ **Elfmeter-Duell:** Die Kinder schießen abwechselnd, jedes hat 10 Schüsse. Wer mehr Tore hat, gewinnt den Pokal.
-   - 🤝 **Team-Pokal:** Beide spielen zusammen, bis das Team 10 Tore geschossen hat.
+   - 🎯 **Solo-Training** (1 Kind): 10 Schüsse – schaffst du 7?
+   - ⚔️ **Elfmeter-Duell** (2–3 Kinder): Alle schießen abwechselnd, jedes Kind hat 10 Schüsse. Wer mehr Tore hat, gewinnt den Pokal.
+   - 🤝 **Team-Pokal** (2–3 Kinder): Gemeinsam 5 Tore pro Kind schießen (2 Kinder = 10 Tore, 3 Kinder = 15 Tore).
 4. **Aufgabenart wählen:**
    - 🔢 **Rechnen:** klassische Aufgaben wie `4 × 5 = ?`
    - 📖 **Textaufgaben:** kurze Fußball-Rechengeschichten (Sticker, Fanbus, Torwand, Pizza nach dem Sieg …). Ein **Bild mit Gruppen** zeigt die Aufgabe, z.B. 4 Kästchen mit je 5 ⚽. Mit **🔊 Vorlesen** liest der Browser die Geschichte vor. Nach der Antwort erscheint die passende Rechnung (`📝 4 × 5 = 20`).
    - 🎲 **Gemischt:** Rechenaufgaben und Textaufgaben abwechselnd.
-5. **ANPFIFF!** drücken.
-6. Für jede Aufgabe die richtige von 4 Antworten antippen.
-   - Richtig: **TOR!** ⚽
-   - Falsch: Die richtige Lösung wird grün angezeigt.
-7. Am Ende gibt es mit **REVANCHE!** ein neues Spiel.
+5. **Zeit wählen:**
+   - 😌 **Ohne Timer:** in Ruhe nachdenken.
+   - ⏱️ **Mit Timer:** **10 Sekunden** für Rechenaufgaben, **15 Sekunden** für Textaufgaben. Ein Balken läuft ab und wird in den letzten 3 Sekunden rot. Ist die Zeit um, zählt der Schuss als gehalten.
+6. **ANPFIFF!** drücken und für jede Aufgabe die richtige von 4 Antworten antippen.
+   - Richtig: Der Ball fliegt ins Tor, **TOR!** ⚽, Konfetti und die Fans jubeln.
+   - Falsch: Der Tormann hält 🧤, die richtige Lösung wird grün angezeigt.
+7. Am Ende gibt es Sterne ⭐ und evtl. eine neu freigeschaltete Stufe 🔓. Mit **NOCHMAL!** geht es direkt weiter.
+
+Im Hintergrund laufen Flutlicht, rollende Bälle und Fans mit La-Ola-Welle.
+
+### 💾 Was wird gespeichert?
+
+Sterne, Fotos und die letzte Auswahl werden **nur im Browser auf diesem Gerät** gespeichert. Die Fotos werden **nicht** hochgeladen und landen nicht auf GitHub. Auf einem anderen Gerät (oder in einem privaten Browserfenster) beginnt man wieder bei null.
+
+### ⚙️ Eltern-Bereich
+
+Ganz unten im Startbildschirm:
+- **🔓 Alle Stufen freischalten** – z.B. wenn ein Kind schon alles kann.
+- **🗑️ Fortschritt zurücksetzen** – löscht alle Sterne.
 
 ## 🌐 Online stellen (GitHub Pages)
 
@@ -51,11 +70,10 @@ Einmalig einrichten, damit der Link oben funktioniert:
 
 Alles steckt in der einen Datei [`index.html`](index.html):
 
-- **Namen der Kinder:** nach `Ilian` und `Johan` suchen und ersetzen.
-- **Fußballstars:** die `<option>`-Einträge bei `star-ilian` bzw. `star-johan` ändern.
+- **Kinder, Farben & Fußballstars:** in der Liste `PLAYERS` (Name, Farbe, Kapitäne).
 - **Textaufgaben:** in der Liste `STORIES` neue Geschichten ergänzen (Symbol + Text).
 - **Reihen pro Stufe:** in der Funktion `getAllowedTables()`.
-- **Anzahl der Schüsse / Tor-Ziel:** `maxTurnsVersus` (Standard 20, also 10 pro Kind) und `targetCoopGoals` (Standard 10).
+- **Regeln:** `WINS_TO_UNLOCK` (Sterne bis zur nächsten Stufe, Standard 2), `PASS_CORRECT` (richtige Antworten für einen Stern, Standard 7), `SHOTS_PER_PLAYER` (Standard 10), `COOP_GOALS_PER_PLAYER` (Standard 5), `TIME_CALC` / `TIME_STORY` (Timer-Sekunden, Standard 10 / 15).
 
 ## 🔗 Links
 
