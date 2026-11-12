@@ -519,6 +519,44 @@
             margin-top: 15px;
         }
 
+        /* ---------- Timer ---------- */
+        .timer {
+            position: relative;
+            height: 26px;
+            max-width: 460px;
+            margin: 0 auto 10px auto;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 13px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .timer-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(90deg, #00c853, #64dd17);
+        }
+
+        .timer.warn .timer-fill { background: linear-gradient(90deg, #ff1744, #ff9100); }
+        .timer.warn { animation: pulse 0.5s ease-in-out infinite; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .timer-num {
+            position: relative;
+            font-weight: 900;
+            font-size: 1rem;
+            line-height: 22px;
+            color: #fff;
+            text-shadow: 1px 1px 2px #000;
+        }
+
         /* ---------- Textaufgaben ---------- */
         .story-box { margin: 5px 0 20px 0; }
 
@@ -660,6 +698,11 @@
             <div class="choice-group" id="task-group"></div>
         </div>
 
+        <div class="setup-section">
+            <strong>5. Zeit:</strong>
+            <div class="choice-group" id="timer-group"></div>
+        </div>
+
         <button class="start-btn" onclick="startGame()">ANPFIFF! 🏟️</button>
         <div class="setup-error" id="setup-error"></div>
 
@@ -681,6 +724,10 @@
                 <span id="shot-ball">⚽</span>
                 <span id="keeper">🧤</span>
                 <span class="goal-icon">🥅</span>
+            </div>
+            <div class="timer hidden" id="timer">
+                <div class="timer-fill" id="timer-fill"></div>
+                <span class="timer-num" id="timer-num"></span>
             </div>
             <div class="question" id="question-text"></div>
             <div class="story-box hidden" id="story-box">
@@ -728,6 +775,8 @@
     const SHOTS_PER_PLAYER = 10;     // Aufgaben pro Kind (Duell & Solo)
     const PASS_CORRECT = 7;          // Mindestens so viele richtig = geschafft
     const COOP_GOALS_PER_PLAYER = 5; // Team-Pokal: Tor-Ziel pro Kind
+    const TIME_CALC = 10;            // Sekunden für klassische 1x1-Aufgaben
+    const TIME_STORY = 15;           // Sekunden für Textaufgaben
 
     const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -744,7 +793,7 @@
 
     let progress = load('arena-progress', {});   // { ilian: { 1: 2, 2: 0 } }
     let settings = Object.assign(
-        { selected: ['ilian', 'johan'], captains: {}, level: 1, mode: 'versus', task: 'calc' },
+        { selected: ['ilian', 'johan'], captains: {}, level: 1, mode: 'versus', task: 'calc', timer: false },
         load('arena-settings', {})
     );
     const photos = {};
@@ -920,6 +969,11 @@
             { val: 'story', label: '📖 Textaufgaben', sub: 'Fußball-Geschichten mit Bild' },
             { val: 'mixed', label: '🎲 Gemischt', sub: 'Beides abwechselnd' }
         ], settings.task, v => { settings.task = v; saveSettings(); renderSetup(); });
+
+        renderChoices('timer-group', [
+            { val: false, label: '😌 Ohne Timer', sub: 'In Ruhe nachdenken' },
+            { val: true, label: '⏱️ Mit Timer', sub: `Rechnen ${TIME_CALC} s · Textaufgaben ${TIME_STORY} s` }
+        ], settings.timer, v => { settings.timer = v; saveSettings(); renderSetup(); });
     }
 
     function unlockAll() {
@@ -1040,6 +1094,36 @@
         pitch.classList.remove('no-anim');
     }
 
+    // ================= Timer =================
+    let timerInterval = null;
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+
+    function startTimer(seconds) {
+        stopTimer();
+        const box = document.getElementById('timer');
+        const fill = document.getElementById('timer-fill');
+        const num = document.getElementById('timer-num');
+        const end = Date.now() + seconds * 1000;
+        box.classList.remove('hidden', 'warn');
+
+        const tick = () => {
+            const left = Math.max(0, end - Date.now());
+            fill.style.width = (left / (seconds * 1000) * 100) + '%';
+            num.innerText = `⏱️ ${Math.ceil(left / 1000)} s`;
+            box.classList.toggle('warn', left <= 3000);
+            if (left <= 0) {
+                stopTimer();
+                checkAnswer(null, null); // Zeit abgelaufen = kein Tor
+            }
+        };
+        tick();
+        timerInterval = setInterval(tick, 100);
+    }
+
     // ================= Spiel =================
     let game = null;
     let currentAnswer = 0;
@@ -1064,6 +1148,7 @@
             level: settings.level,
             mode: sel.length === 1 ? 'solo' : settings.mode,
             task: settings.task,
+            timer: !!settings.timer,
             turn: 0,
             teamGoals: 0,
             stats: {}
@@ -1139,11 +1224,19 @@
             btn.onclick = () => checkAnswer(num, btn);
             container.appendChild(btn);
         });
+
+        if (game.timer) {
+            startTimer(isStory ? TIME_STORY : TIME_CALC);
+        } else {
+            document.getElementById('timer').classList.add('hidden');
+        }
     }
 
     function checkAnswer(selected, btnElement) {
         if (isLocked) return;
         isLocked = true;
+        stopTimer();
+        const timedOut = selected === null;
 
         const pid = currentPid();
         const name = P(pid).name;
@@ -1168,12 +1261,14 @@
             ]);
             feedback.style.color = '#00e676';
         } else {
-            btnElement.classList.add('wrong');
+            if (btnElement) btnElement.classList.add('wrong');
             pitch.classList.add('saved');
             document.querySelectorAll('.ans-btn').forEach(b => {
                 if (parseInt(b.innerText) === currentAnswer) b.classList.add('correct');
             });
-            feedback.innerText = `Gehalten! Richtig wäre ${currentAnswer} gewesen. 🧤`;
+            feedback.innerText = timedOut
+                ? `⏰ Zeit abgelaufen! Richtig wäre ${currentAnswer} gewesen.`
+                : `Gehalten! Richtig wäre ${currentAnswer} gewesen. 🧤`;
             feedback.style.color = '#ff8a80';
         }
 
@@ -1340,6 +1435,7 @@
     }
 
     function resetToMenu() {
+        stopTimer();
         if ('speechSynthesis' in window) speechSynthesis.cancel();
         document.getElementById('end-screen').classList.add('hidden');
         document.getElementById('game-screen').classList.add('hidden');

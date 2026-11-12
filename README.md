@@ -35,10 +35,13 @@ Das Spiel läuft direkt im Browser, auf PC, Tablet und Handy. Man braucht keine 
    - 🔢 **Rechnen:** klassische Aufgaben wie `4 × 5 = ?`
    - 📖 **Textaufgaben:** kurze Fußball-Rechengeschichten (Sticker, Fanbus, Torwand, Pizza nach dem Sieg …). Ein **Bild mit Gruppen** zeigt die Aufgabe, z.B. 4 Kästchen mit je 5 ⚽. Mit **🔊 Vorlesen** liest der Browser die Geschichte vor. Nach der Antwort erscheint die passende Rechnung (`📝 4 × 5 = 20`).
    - 🎲 **Gemischt:** Rechenaufgaben und Textaufgaben abwechselnd.
-5. **ANPFIFF!** drücken und für jede Aufgabe die richtige von 4 Antworten antippen.
+5. **Zeit wählen:**
+   - 😌 **Ohne Timer:** in Ruhe nachdenken.
+   - ⏱️ **Mit Timer:** **10 Sekunden** für Rechenaufgaben, **15 Sekunden** für Textaufgaben. Ein Balken läuft ab und wird in den letzten 3 Sekunden rot. Ist die Zeit um, zählt der Schuss als gehalten.
+6. **ANPFIFF!** drücken und für jede Aufgabe die richtige von 4 Antworten antippen.
    - Richtig: Der Ball fliegt ins Tor, **TOR!** ⚽, Konfetti und die Fans jubeln.
    - Falsch: Der Tormann hält 🧤, die richtige Lösung wird grün angezeigt.
-6. Am Ende gibt es Sterne ⭐ und evtl. eine neu freigeschaltete Stufe 🔓. Mit **NOCHMAL!** geht es direkt weiter.
+7. Am Ende gibt es Sterne ⭐ und evtl. eine neu freigeschaltete Stufe 🔓. Mit **NOCHMAL!** geht es direkt weiter.
 
 Im Hintergrund laufen Flutlicht, rollende Bälle und Fans mit La-Ola-Welle.
 
@@ -70,7 +73,7 @@ Alles steckt in der einen Datei [`index.html`](index.html):
 - **Kinder, Farben & Fußballstars:** in der Liste `PLAYERS` (Name, Farbe, Kapitäne).
 - **Textaufgaben:** in der Liste `STORIES` neue Geschichten ergänzen (Symbol + Text).
 - **Reihen pro Stufe:** in der Funktion `getAllowedTables()`.
-- **Regeln:** `WINS_TO_UNLOCK` (Sterne bis zur nächsten Stufe, Standard 2), `PASS_CORRECT` (richtige Antworten für einen Stern, Standard 7), `SHOTS_PER_PLAYER` (Standard 10), `COOP_GOALS_PER_PLAYER` (Standard 5).
+- **Regeln:** `WINS_TO_UNLOCK` (Sterne bis zur nächsten Stufe, Standard 2), `PASS_CORRECT` (richtige Antworten für einen Stern, Standard 7), `SHOTS_PER_PLAYER` (Standard 10), `COOP_GOALS_PER_PLAYER` (Standard 5), `TIME_CALC` / `TIME_STORY` (Timer-Sekunden, Standard 10 / 15).
 
 ## 🔗 Links
 
