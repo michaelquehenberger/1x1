@@ -269,6 +269,57 @@
             transform: scale(1.6) rotate(360deg);
         }
 
+        /* Textaufgaben */
+        .story-box {
+            margin: 5px 0 20px 0;
+        }
+
+        .story-text {
+            font-size: 1.35rem;
+            line-height: 1.5;
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.25);
+            border-left: 5px solid var(--gold);
+            border-radius: 12px;
+            padding: 12px 16px;
+            text-align: left;
+        }
+
+        .read-btn {
+            background: #455a64;
+            color: #fff;
+            font-size: 1rem;
+            padding: 6px 14px;
+            margin-top: 10px;
+        }
+
+        .story-visual {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .story-group {
+            display: grid;
+            gap: 2px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 2px dashed rgba(255, 215, 0, 0.6);
+            border-radius: 10px;
+            padding: 5px 6px;
+            font-size: 1.15rem;
+            line-height: 1.2;
+        }
+
+        .story-solution {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--gold);
+            margin-top: 12px;
+            min-height: 1.8rem;
+        }
+
         /* End Screen */
         .trophy { font-size: 5rem; margin: 10px 0; }
         .winner-text { font-size: 2.2rem; color: var(--gold); font-weight: bold; margin-bottom: 10px; }
@@ -326,6 +377,15 @@
             </div>
         </div>
 
+        <div class="setup-section">
+            <strong>3. Aufgabenart:</strong>
+            <div class="mode-buttons" id="task-group">
+                <button class="choice-btn active" data-val="calc">🔢 Rechnen<br><small>z.B. 4 × 5 = ?</small></button>
+                <button class="choice-btn" data-val="story">📖 Textaufgaben<br><small>Fußball-Geschichten mit Bild</small></button>
+                <button class="choice-btn" data-val="mixed">🎲 Gemischt<br><small>Beides abwechselnd</small></button>
+            </div>
+        </div>
+
         <button class="start-btn" onclick="startGame()">ANPFIFF! 🏟️</button>
     </div>
 
@@ -366,6 +426,12 @@
         <div class="math-box">
             <div class="ball-anim" id="soccer-ball">⚽</div>
             <div class="question" id="question-text">2 × 5 = ?</div>
+            <div class="story-box hidden" id="story-box">
+                <div class="story-text" id="story-text"></div>
+                <button class="read-btn" id="read-btn" onclick="readStory()">🔊 Vorlesen</button>
+                <div class="story-visual" id="story-visual"></div>
+                <div class="story-solution" id="story-solution"></div>
+            </div>
             <div class="answers-grid" id="answers-container"></div>
             <div class="feedback-overlay" id="feedback-text"></div>
         </div>
@@ -390,6 +456,29 @@
     const targetCoopGoals = 10;
     let currentAnswer = 0;
     let isLocked = false;
+    let taskType = 'calc'; // 'calc', 'story' oder 'mixed'
+    let isStory = false;
+    let currentEquation = '';
+
+    // Hilfsfunktion: Einzahl oder Mehrzahl
+    const pl = (n, one, many) => n === 1 ? one : many;
+
+    // Fußball-Rechengeschichten: a = Anzahl der Gruppen, b = Anzahl pro Gruppe
+    // n = Name des Kindes, star = gewählter Kapitän
+    const STORIES = [
+        { icon: '⭐', text: (a, b, n) => `${n} kauft ${a} ${pl(a, 'Packung', 'Packungen')} Fußball-Sticker. In jeder Packung ${pl(b, 'ist 1 Sticker', `sind ${b} Sticker`)}. Wie viele Sticker sind das zusammen?` },
+        { icon: '⚽', text: (a, b) => `Der Zeugwart füllt ${a} ${pl(a, 'Ballnetz', 'Ballnetze')}. In jedes Netz kommen ${b} ${pl(b, 'Ball', 'Bälle')}. Wie viele Bälle sind das?` },
+        { icon: '🧑', text: (a, b) => `Im Fanbus gibt es ${a} ${pl(a, 'Reihe', 'Reihen')}. In jeder Reihe ${pl(b, 'sitzt 1 Fan', `sitzen ${b} Fans`)}. Wie viele Fans fahren mit zum Spiel?` },
+        { icon: '🟠', text: (a, b) => `Beim Training stellt der Trainer ${a} ${pl(a, 'Reihe', 'Reihen')} mit je ${b} Hütchen auf. Wie viele Hütchen sind das?` },
+        { icon: '🧣', text: (a, b) => `Im Fanshop liegen ${a} Stapel mit je ${b} ${pl(b, 'Schal', 'Schals')}. Wie viele Schals sind es insgesamt?` },
+        { icon: '✍️', text: (a, b, n, star) => `${star} schreibt für ${a} ${pl(a, 'Kind', 'Kinder')} je ${b} ${pl(b, 'Autogramm', 'Autogramme')}. Wie viele Autogramme sind das?` },
+        { icon: '🎯', text: (a, b, n) => `Bei der Torwand bringt jeder Treffer ${b} ${pl(b, 'Punkt', 'Punkte')}. ${n} trifft ${a === 1 ? 'einmal' : a + '\u2011mal'}. Wie viele Punkte bekommt ${n}?` },
+        { icon: '🥤', text: (a, b) => `In einer Getränkekiste stehen ${a} ${pl(a, 'Reihe', 'Reihen')} mit je ${b} ${pl(b, 'Flasche', 'Flaschen')}. Wie viele Flaschen sind in der Kiste?` },
+        { icon: '💶', text: (a, b, n) => `Ein Fußball-Poster kostet ${b} Euro. ${n} kauft ${a} Poster. Wie viel Euro muss ${n} bezahlen?` },
+        { icon: '👟', text: (a, b) => `In der Kabine stehen ${a} ${pl(a, 'Regal', 'Regale')}. In jedem Regal ${pl(b, 'steht 1 Fußballschuh', `stehen ${b} Fußballschuhe`)}. Wie viele Schuhe sind das?` },
+        { icon: '🥅', text: (a, b) => `Im Turnier spielen ${a} ${pl(a, 'Mannschaft', 'Mannschaften')}. Jede Mannschaft schießt ${b} ${pl(b, 'Tor', 'Tore')}. Wie viele Tore fallen insgesamt?` },
+        { icon: '🍕', text: (a, b) => `Nach dem Sieg gibt es Pizza! Auf ${a} ${pl(a, 'Teller', 'Tellern')} liegen je ${b} ${pl(b, 'Stück', 'Stücke')}. Wie viele Stücke sind das?` }
+    ];
 
     // Auswahl-Buttons aktivieren
     document.querySelectorAll('#level-group .choice-btn').forEach(btn => {
@@ -407,6 +496,57 @@
             mode = btn.dataset.val;
         });
     });
+
+    document.querySelectorAll('#task-group .choice-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#task-group .choice-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            taskType = btn.dataset.val;
+        });
+    });
+
+    // Name des Kapitäns ohne Emoji, z.B. "Lionel Messi"
+    function starFullName(player) {
+        const id = player === 1 ? 'star-ilian' : 'star-johan';
+        return document.getElementById(id).value.replace(/\s+\S+$/, '');
+    }
+
+    function renderStory(a, b) {
+        const story = STORIES[Math.floor(Math.random() * STORIES.length)];
+        const name = currentPlayer === 1 ? 'Ilian' : 'Johan';
+        document.getElementById('story-text').innerText = story.text(a, b, name, starFullName(currentPlayer));
+        document.getElementById('story-solution').innerText = '';
+
+        // Bild: a Gruppen mit je b Symbolen
+        const visual = document.getElementById('story-visual');
+        visual.innerHTML = '';
+        for (let g = 0; g < a; g++) {
+            const group = document.createElement('div');
+            group.className = 'story-group';
+            // Bis 5 in einer Zeile, darüber in zwei Zeilen (z.B. 6 = 3 + 3, 8 = 4 + 4)
+            const cols = b <= 5 ? b : Math.ceil(b / 2);
+            group.style.gridTemplateColumns = `repeat(${cols}, auto)`;
+            for (let i = 0; i < b; i++) {
+                const item = document.createElement('span');
+                item.innerText = story.icon;
+                group.appendChild(item);
+            }
+            visual.appendChild(group);
+        }
+    }
+
+    function readStory() {
+        if (!('speechSynthesis' in window)) return;
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(document.getElementById('story-text').innerText);
+        u.lang = 'de-DE';
+        u.rate = 0.9;
+        speechSynthesis.speak(u);
+    }
+
+    if (!('speechSynthesis' in window)) {
+        document.getElementById('read-btn').classList.add('hidden');
+    }
 
     function startGame() {
         scores = { 1: 0, 2: 0, coop: 0 };
@@ -449,9 +589,14 @@
         document.getElementById('feedback-text').innerText = '';
         document.getElementById('soccer-ball').classList.remove('goal-scored');
 
-        const tables = getAllowedTables();
+        isStory = taskType === 'story' || (taskType === 'mixed' && Math.random() < 0.5);
+
+        // Bei Textaufgaben ohne "× 1" – die Geschichten sollen echte Gruppen zeigen
+        const tables = getAllowedTables().filter(t => !isStory || t !== 1);
         const table = tables[Math.floor(Math.random() * tables.length)];
-        const multiplier = Math.floor(Math.random() * 10) + 1;
+        const multiplier = isStory
+            ? Math.floor(Math.random() * 9) + 2
+            : Math.floor(Math.random() * 10) + 1;
 
         // Zufällig tauschen (z.B. 3x5 oder 5x3)
         const swap = Math.random() > 0.5;
@@ -459,7 +604,20 @@
         const b = swap ? multiplier : table;
 
         currentAnswer = a * b;
-        document.getElementById('question-text').innerText = `${a} × ${b} = ?`;
+        currentEquation = `${a} × ${b} = ${currentAnswer}`;
+
+        if ('speechSynthesis' in window) speechSynthesis.cancel();
+        const questionEl = document.getElementById('question-text');
+        const storyBox = document.getElementById('story-box');
+        if (isStory) {
+            questionEl.classList.add('hidden');
+            storyBox.classList.remove('hidden');
+            renderStory(a, b);
+        } else {
+            storyBox.classList.add('hidden');
+            questionEl.classList.remove('hidden');
+            questionEl.innerText = `${a} × ${b} = ?`;
+        }
 
         // 3 plausible Falschantworten erzeugen
         let options = new Set([currentAnswer]);
@@ -525,9 +683,16 @@
             feedback.style.color = '#ff8a80';
         }
 
+        // Bei Textaufgaben die passende Rechnung zeigen
+        if (isStory) {
+            document.getElementById('story-solution').innerText = `📝 ${currentEquation}`;
+        }
+
         turnsPlayed++;
         updateUI();
 
+        // Bei falschen Textaufgaben etwas länger warten, damit man Bild & Rechnung anschauen kann
+        const delay = (isStory && selected !== currentAnswer) ? 3500 : (isStory ? 2500 : 1800);
         setTimeout(() => {
             if (checkGameOver()) {
                 showEndScreen();
@@ -536,7 +701,7 @@
                 updateUI();
                 generateQuestion();
             }
-        }, 1800);
+        }, delay);
     }
 
     function updateUI() {

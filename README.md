@@ -26,11 +26,15 @@ Das Spiel läuft direkt im Browser, auf PC, Tablet und Handy. Man braucht keine 
 3. **Spielmodus wählen:**
    - ⚔️ **Elfmeter-Duell:** Die Kinder schießen abwechselnd, jedes hat 10 Schüsse. Wer mehr Tore hat, gewinnt den Pokal.
    - 🤝 **Team-Pokal:** Beide spielen zusammen, bis das Team 10 Tore geschossen hat.
-4. **ANPFIFF!** drücken.
-5. Für jede Aufgabe die richtige von 4 Antworten antippen.
+4. **Aufgabenart wählen:**
+   - 🔢 **Rechnen:** klassische Aufgaben wie `4 × 5 = ?`
+   - 📖 **Textaufgaben:** kurze Fußball-Rechengeschichten (Sticker, Fanbus, Torwand, Pizza nach dem Sieg …). Ein **Bild mit Gruppen** zeigt die Aufgabe, z.B. 4 Kästchen mit je 5 ⚽. Mit **🔊 Vorlesen** liest der Browser die Geschichte vor. Nach der Antwort erscheint die passende Rechnung (`📝 4 × 5 = 20`).
+   - 🎲 **Gemischt:** Rechenaufgaben und Textaufgaben abwechselnd.
+5. **ANPFIFF!** drücken.
+6. Für jede Aufgabe die richtige von 4 Antworten antippen.
    - Richtig: **TOR!** ⚽
    - Falsch: Die richtige Lösung wird grün angezeigt.
-6. Am Ende gibt es mit **REVANCHE!** ein neues Spiel.
+7. Am Ende gibt es mit **REVANCHE!** ein neues Spiel.
 
 ## 🌐 Online stellen (GitHub Pages)
 
@@ -49,6 +53,7 @@ Alles steckt in der einen Datei [`index.html`](index.html):
 
 - **Namen der Kinder:** nach `Ilian` und `Johan` suchen und ersetzen.
 - **Fußballstars:** die `<option>`-Einträge bei `star-ilian` bzw. `star-johan` ändern.
+- **Textaufgaben:** in der Liste `STORIES` neue Geschichten ergänzen (Symbol + Text).
 - **Reihen pro Stufe:** in der Funktion `getAllowedTables()`.
 - **Anzahl der Schüsse / Tor-Ziel:** `maxTurnsVersus` (Standard 20, also 10 pro Kind) und `targetCoopGoals` (Standard 10).
 
