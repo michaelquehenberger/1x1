@@ -3,27 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1x1 Fußball-Arena: Ilian vs. Johan</title>
+    <title>1x1 Fußball-Arena</title>
     <style>
         :root {
             --grass-dark: #1b5e20;
             --grass-light: #2e7d32;
             --gold: #ffd700;
             --white: #ffffff;
-            --blue-team: #0288d1;
-            --red-team: #d32f2f;
-            --dark-bg: #121212;
         }
 
         * {
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             margin: 0;
-            padding: 0;
+            padding: 20px 0 90px 0;
             background: repeating-linear-gradient(
                 90deg,
                 var(--grass-dark),
@@ -37,19 +35,117 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            overflow-x: hidden;
         }
 
+        /* ---------- Hintergrund-Animation ---------- */
+        #bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .light {
+            position: absolute;
+            top: -120px;
+            width: 360px;
+            height: 360px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 220, 0.45), rgba(255, 255, 220, 0) 65%);
+            animation: flood 4s ease-in-out infinite;
+        }
+        .light.l1 { left: -100px; }
+        .light.l2 { right: -100px; animation-delay: 2s; }
+
+        @keyframes flood {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .roll {
+            position: absolute;
+            left: -60px;
+            font-size: 2.2rem;
+            opacity: 0.45;
+            animation: roll 14s linear infinite;
+        }
+        .roll.r1 { top: 18%; }
+        .roll.r2 { top: 52%; animation-duration: 19s; animation-delay: -6s; }
+        .roll.r3 { top: 78%; animation-duration: 11s; animation-delay: -3s; }
+
+        @keyframes roll {
+            from { transform: translateX(0) rotate(0deg); }
+            to { transform: translateX(calc(100vw + 120px)) rotate(1080deg); }
+        }
+
+        .crowd {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 70px;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            padding-bottom: 6px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
+            font-size: 1.8rem;
+        }
+
+        .fan {
+            display: inline-block;
+            animation: wave 3s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 70%, 100% { transform: translateY(0); }
+            80% { transform: translateY(-18px); }
+        }
+
+        body.cheer .fan { animation: jump 0.4s ease-in-out infinite; }
+
+        @keyframes jump {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-22px) scale(1.15); }
+        }
+
+        #confetti {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 50;
+            overflow: hidden;
+        }
+
+        .conf {
+            position: absolute;
+            top: -40px;
+            font-size: 1.6rem;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(540deg); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .light, .roll, .fan, body.cheer .fan, .conf, #keeper { animation: none !important; }
+        }
+
+        /* ---------- Karte ---------- */
         .stadium-card {
-            background: rgba(18, 25, 35, 0.92);
+            background: rgba(18, 25, 35, 0.95);
             border: 4px solid var(--gold);
             border-radius: 24px;
             padding: 25px;
             width: 95%;
-            max-width: 750px;
+            max-width: 800px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.6);
             text-align: center;
             position: relative;
-            overflow: hidden;
+            z-index: 1;
         }
 
         h1 {
@@ -67,35 +163,101 @@
             margin-bottom: 20px;
         }
 
-        /* Setup Screen */
-        .setup-section {
-            margin-bottom: 20px;
+        .setup-section { margin-bottom: 18px; }
+
+        .rule-hint {
+            font-size: 0.95rem;
+            color: #b0bec5;
+            margin-top: -8px;
         }
 
+        /* ---------- Spieler-Karten ---------- */
         .player-setup {
             display: flex;
-            justify-content: space-around;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin: 10px 0 20px 0;
             flex-wrap: wrap;
+            justify-content: center;
         }
 
         .player-card {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.05);
             border-radius: 16px;
-            padding: 15px;
+            padding: 12px;
             flex: 1;
-            min-width: 240px;
-            border: 2px solid transparent;
+            min-width: 200px;
+            max-width: 250px;
+            border: 3px solid rgba(255,255,255,0.15);
+            opacity: 0.55;
+            transition: opacity 0.2s, border-color 0.2s, transform 0.2s;
         }
 
-        .player-card.ilian { border-color: var(--blue-team); }
-        .player-card.johan { border-color: var(--red-team); }
+        .player-card.selected {
+            border-color: var(--pc);
+            background: rgba(255,255,255,0.1);
+            opacity: 1;
+            transform: scale(1.02);
+        }
 
         .player-card h3 {
-            margin: 0 0 10px 0;
+            margin: 6px 0 8px 0;
             font-size: 1.4rem;
         }
+
+        .join-btn {
+            width: 100%;
+            background: #37474f;
+            color: #fff;
+            font-size: 1rem;
+            padding: 8px;
+        }
+
+        .player-card.selected .join-btn { background: var(--pc); }
+
+        .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--pc, #546e7a);
+            color: #fff;
+            font-weight: 900;
+            border: 3px solid var(--pc, #fff);
+            flex-shrink: 0;
+            vertical-align: middle;
+        }
+
+        .avatar-lg { width: 92px; height: 92px; font-size: 2.6rem; margin-top: 10px; }
+        .avatar-md { width: 52px; height: 52px; font-size: 1.5rem; }
+        .avatar-sm { width: 34px; height: 34px; font-size: 1rem; border-width: 2px; }
+
+        .photo-actions {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-top: 6px;
+        }
+
+        .photo-btn, .photo-del {
+            background: #263238;
+            color: #fff;
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 10px;
+            border: 1px solid #546e7a;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .progress-line {
+            margin-top: 8px;
+            font-size: 0.95rem;
+            color: #eceff1;
+            line-height: 1.6;
+        }
+
+        .progress-line span { white-space: nowrap; display: inline-block; margin: 0 4px; }
 
         select, button {
             font-size: 1.1rem;
@@ -112,15 +274,18 @@
             background: #263238;
             color: white;
             border: 2px solid #546e7a;
-            margin-top: 5px;
+            margin-top: 4px;
+            font-size: 1rem;
         }
 
-        .level-buttons, .mode-buttons {
+        .cap-label { font-size: 0.9rem; color: #b0bec5; }
+
+        .choice-group {
             display: flex;
             gap: 10px;
             justify-content: center;
             flex-wrap: wrap;
-            margin: 10px 0 20px 0;
+            margin: 10px 0 10px 0;
         }
 
         .choice-btn {
@@ -138,6 +303,21 @@
             transform: scale(1.03);
         }
 
+        .choice-btn.locked {
+            background: #263238;
+            color: #78909c;
+            border-style: dashed;
+            cursor: not-allowed;
+        }
+
+        .choice-btn.shake { animation: shake 0.4s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
         .start-btn {
             background: linear-gradient(45deg, #00c853, #64dd17);
             color: #000;
@@ -151,75 +331,155 @@
         .start-btn:hover { transform: translateY(-2px); }
         .start-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #1b5e20; }
 
-        /* Scoreboard */
+        .secondary-btn {
+            background: #455a64;
+            color: #fff;
+            margin-top: 10px;
+        }
+
+        .setup-error {
+            color: #ff8a80;
+            font-weight: bold;
+            min-height: 1.4rem;
+            margin-top: 8px;
+        }
+
+        .parents {
+            margin-top: 18px;
+            font-size: 0.9rem;
+            color: #90a4ae;
+        }
+
+        .parents summary { cursor: pointer; }
+
+        .parents button {
+            font-size: 0.9rem;
+            padding: 6px 12px;
+            margin: 8px 4px 0 4px;
+            background: #37474f;
+            color: #fff;
+        }
+
+        /* ---------- Anzeigetafel ---------- */
         .scoreboard {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: center;
+            align-items: stretch;
+            gap: 10px;
             background: #000;
             border: 3px solid #455a64;
             border-radius: 16px;
-            padding: 12px 20px;
-            margin-bottom: 20px;
+            padding: 10px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
         }
 
         .team-score {
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 38%;
+            flex: 1;
+            min-width: 120px;
             padding: 8px;
             border-radius: 12px;
+            border: 2px solid transparent;
             transition: all 0.3s;
         }
 
         .team-score.active-turn {
             background: rgba(255, 215, 0, 0.2);
             box-shadow: 0 0 15px var(--gold);
-            transform: scale(1.05);
+            border-color: var(--gold);
+            transform: scale(1.04);
         }
 
-        .team-name {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
+        .team-name { font-size: 1.15rem; font-weight: bold; margin-top: 4px; }
+        .star-badge { font-size: 0.8rem; color: #b0bec5; }
+        .goals { font-size: 2.3rem; font-weight: 900; color: var(--gold); line-height: 1.1; }
 
-        .star-badge {
-            font-size: 0.85rem;
-            color: #b0bec5;
-        }
-
-        .goals {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--gold);
-        }
-
-        .vs-box {
-            font-size: 1.3rem;
+        .round-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-size: 1.1rem;
             font-weight: bold;
             color: #90a4ae;
+            min-width: 90px;
         }
 
-        /* Pitch & Math Area */
+        .team-avatars { display: flex; gap: 4px; justify-content: center; }
+
+        /* ---------- Spielfeld ---------- */
         .turn-banner {
             font-size: 1.4rem;
             font-weight: bold;
-            padding: 8px 20px;
-            border-radius: 30px;
-            display: inline-block;
+            padding: 6px 18px 6px 8px;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
             margin-bottom: 15px;
         }
 
-        .turn-ilian { background: var(--blue-team); }
-        .turn-johan { background: var(--red-team); }
+        .turn-banner .avatar { border-color: #fff; }
 
         .math-box {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
+            padding: 15px 25px 25px 25px;
+            margin-bottom: 10px;
             position: relative;
+        }
+
+        .mini-pitch {
+            position: relative;
+            height: 60px;
+            max-width: 460px;
+            margin: 0 auto 5px auto;
+            border-bottom: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        #shot-ball {
+            position: absolute;
+            left: 4%;
+            top: 14px;
+            font-size: 2rem;
+            transition: left 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .goal-icon {
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 2.8rem;
+        }
+
+        #keeper {
+            position: absolute;
+            right: 3.4rem;
+            top: 14px;
+            font-size: 1.7rem;
+            animation: keeper 1.6s ease-in-out infinite;
+            transition: transform 0.3s;
+        }
+
+        @keyframes keeper {
+            0%, 100% { transform: translateY(-8px); }
+            50% { transform: translateY(8px); }
+        }
+
+        .mini-pitch.hit #shot-ball { left: calc(100% - 2.6rem); transform: rotate(720deg) scale(0.85); }
+        .mini-pitch.hit .goal-icon { animation: net 0.5s 0.5s; }
+        .mini-pitch.hit #keeper { animation: none; transform: translateY(-22px) rotate(-30deg); }
+
+        .mini-pitch.saved #shot-ball { left: 62%; transform: rotate(360deg); }
+        .mini-pitch.saved #keeper { animation: none; transform: scale(1.6); }
+
+        .mini-pitch.no-anim #shot-ball { transition: none; }
+
+        @keyframes net {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
         }
 
         .question {
@@ -253,26 +513,14 @@
         .ans-btn.wrong { background: #ff1744 !important; color: #fff; box-shadow: 0 5px 0 #b2102f; }
 
         .feedback-overlay {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: bold;
             min-height: 40px;
             margin-top: 15px;
         }
 
-        .ball-anim {
-            font-size: 3rem;
-            display: inline-block;
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .goal-scored {
-            transform: scale(1.6) rotate(360deg);
-        }
-
-        /* Textaufgaben */
-        .story-box {
-            margin: 5px 0 20px 0;
-        }
+        /* ---------- Textaufgaben ---------- */
+        .story-box { margin: 5px 0 20px 0; }
 
         .story-text {
             font-size: 1.35rem;
@@ -320,112 +568,121 @@
             min-height: 1.8rem;
         }
 
-        /* End Screen */
+        /* ---------- Endbildschirm ---------- */
         .trophy { font-size: 5rem; margin: 10px 0; }
-        .winner-text { font-size: 2.2rem; color: var(--gold); font-weight: bold; margin-bottom: 10px; }
+        .winner-text { font-size: 2rem; color: var(--gold); font-weight: bold; margin-bottom: 15px; }
+
+        .result-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 520px;
+            margin: 0 auto 15px auto;
+        }
+
+        .result-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 10px 14px;
+            text-align: left;
+            border-left: 5px solid var(--pc);
+        }
+
+        .result-row .r-main { flex: 1; }
+        .result-row .r-name { font-size: 1.25rem; font-weight: bold; }
+        .result-row .r-msg { font-size: 1rem; color: #cfd8dc; margin-top: 2px; }
+        .result-row .r-score { font-size: 1.8rem; font-weight: 900; color: var(--gold); white-space: nowrap; }
+
+        .unlock-msg {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .end-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
         .hidden { display: none !important; }
+
+        @media (max-width: 480px) {
+            .stadium-card { padding: 16px; }
+            h1 { font-size: 1.6rem; }
+            .question { font-size: 2.6rem; letter-spacing: 1px; }
+            .player-card { min-width: 100%; }
+            .turn-banner { font-size: 1.15rem; }
+        }
     </style>
 </head>
 <body>
+
+<!-- Hintergrund: Flutlicht, rollende Bälle, Fans mit La-Ola-Welle -->
+<div id="bg" aria-hidden="true">
+    <div class="light l1"></div>
+    <div class="light l2"></div>
+    <span class="roll r1">⚽</span>
+    <span class="roll r2">⚽</span>
+    <span class="roll r3">⚽</span>
+    <div class="crowd" id="crowd"></div>
+</div>
+<div id="confetti" aria-hidden="true"></div>
 
 <div class="stadium-card">
     <!-- STARTBILDSCHIRM -->
     <div id="setup-screen">
         <h1>⚽ 1x1 Champions Arena ⚽</h1>
-        <div class="subtitle">2. Klasse Volksschule – Ilian & Johan</div>
+        <div class="subtitle">2. Klasse Volksschule – Ilian, Johan & Helena</div>
 
-        <div class="player-setup">
-            <div class="player-card ilian">
-                <h3>🔵 Ilian</h3>
-                <label>Wähle deinen Kapitän:</label>
-                <select id="star-ilian">
-                    <option value="Lionel Messi 🐐">Lionel Messi 🐐</option>
-                    <option value="Kylian Mbappé ⚡">Kylian Mbappé ⚡</option>
-                    <option value="Erling Haaland 🤖">Erling Haaland 🤖</option>
-                    <option value="Lamine Yamal 🌟">Lamine Yamal 🌟</option>
-                    <option value="David Alaba 🇦🇹">David Alaba 🇦🇹</option>
-                </select>
-            </div>
-
-            <div class="player-card johan">
-                <h3>🔴 Johan</h3>
-                <label>Wähle deinen Kapitän:</label>
-                <select id="star-johan">
-                    <option value="Cristiano Ronaldo 🚀">Cristiano Ronaldo 🚀</option>
-                    <option value="Jude Bellingham 👑">Jude Bellingham 👑</option>
-                    <option value="Vinícius Júnior 🔥">Vinícius Júnior 🔥</option>
-                    <option value="Jamal Musiala ✨">Jamal Musiala ✨</option>
-                    <option value="Marko Arnautović 🇦🇹">Marko Arnautović 🇦🇹</option>
-                </select>
-            </div>
+        <div class="setup-section">
+            <strong>1. Wer spielt mit?</strong>
+            <div class="player-setup" id="player-setup"></div>
         </div>
 
         <div class="setup-section">
-            <strong>1. Schwierigkeitsstufe (2. Klasse):</strong>
-            <div class="level-buttons" id="level-group">
-                <button class="choice-btn active" data-val="1">🥉 Rookie<br><small>1er, 2er, 5er, 10er</small></button>
-                <button class="choice-btn" data-val="2">🥈 Profi<br><small>+ 3er & 4er Reihe</small></button>
-                <button class="choice-btn" data-val="3">🥇 Weltmeister<br><small>Alle 1x1 Reihen</small></button>
-            </div>
+            <strong>2. Schwierigkeitsstufe:</strong>
+            <div class="choice-group" id="level-group"></div>
+            <div class="rule-hint">⭐ Geschafft = mindestens 7 von 10 richtig. 2 Sterne → nächste Stufe wird frei!</div>
         </div>
 
         <div class="setup-section">
-            <strong>2. Spielmodus:</strong>
-            <div class="mode-buttons" id="mode-group">
-                <button class="choice-btn active" data-val="versus">⚔️ Elfmeter-Duell (1 vs 1)</button>
-                <button class="choice-btn" data-val="coop">🤝 Team-Pokal (Gemeinsam)</button>
-            </div>
+            <strong>3. Spielmodus:</strong>
+            <div class="choice-group" id="mode-group"></div>
         </div>
 
         <div class="setup-section">
-            <strong>3. Aufgabenart:</strong>
-            <div class="mode-buttons" id="task-group">
-                <button class="choice-btn active" data-val="calc">🔢 Rechnen<br><small>z.B. 4 × 5 = ?</small></button>
-                <button class="choice-btn" data-val="story">📖 Textaufgaben<br><small>Fußball-Geschichten mit Bild</small></button>
-                <button class="choice-btn" data-val="mixed">🎲 Gemischt<br><small>Beides abwechselnd</small></button>
-            </div>
+            <strong>4. Aufgabenart:</strong>
+            <div class="choice-group" id="task-group"></div>
         </div>
 
         <button class="start-btn" onclick="startGame()">ANPFIFF! 🏟️</button>
+        <div class="setup-error" id="setup-error"></div>
+
+        <details class="parents">
+            <summary>⚙️ Eltern-Bereich</summary>
+            <button type="button" onclick="unlockAll()">🔓 Alle Stufen freischalten</button>
+            <button type="button" onclick="resetProgress()">🗑️ Fortschritt zurücksetzen</button>
+        </details>
     </div>
 
     <!-- SPIELBILDSCHIRM -->
     <div id="game-screen" class="hidden">
-        <!-- Scoreboard für Duell -->
-        <div id="scoreboard-versus" class="scoreboard">
-            <div class="team-score" id="card-p1">
-                <span class="team-name">🔵 Ilian</span>
-                <span class="star-badge" id="badge-p1">Messi</span>
-                <span class="goals" id="score-p1">0</span>
-            </div>
-            <div class="vs-box">
-                <div>Runde <span id="round-num">1</span> / 10</div>
-                <div style="font-size: 1.5rem; margin-top:4px;">⚽</div>
-            </div>
-            <div class="team-score" id="card-p2">
-                <span class="team-name">🔴 Johan</span>
-                <span class="star-badge" id="badge-p2">Ronaldo</span>
-                <span class="goals" id="score-p2">0</span>
-            </div>
-        </div>
+        <div class="scoreboard" id="scoreboard"></div>
 
-        <!-- Scoreboard für Team-Modus -->
-        <div id="scoreboard-coop" class="scoreboard hidden">
-            <div class="team-score" style="width: 60%;">
-                <span class="team-name">🔵🔴 Team Ilian & Johan</span>
-                <span class="star-badge" id="badge-coop">Dreamteam</span>
-            </div>
-            <div class="team-score" style="width: 35%;">
-                <span class="team-name">Tore (Ziel: 10)</span>
-                <span class="goals" id="score-coop">0</span>
-            </div>
-        </div>
-
-        <div id="turn-indicator" class="turn-banner turn-ilian">Ilian ist am Ball!</div>
+        <div id="turn-indicator" class="turn-banner"></div>
 
         <div class="math-box">
-            <div class="ball-anim" id="soccer-ball">⚽</div>
-            <div class="question" id="question-text">2 × 5 = ?</div>
+            <div class="mini-pitch" id="mini-pitch">
+                <span id="shot-ball">⚽</span>
+                <span id="keeper">🧤</span>
+                <span class="goal-icon">🥅</span>
+            </div>
+            <div class="question" id="question-text"></div>
             <div class="story-box hidden" id="story-box">
                 <div class="story-text" id="story-text"></div>
                 <button class="read-btn" id="read-btn" onclick="readStory()">🔊 Vorlesen</button>
@@ -439,32 +696,254 @@
 
     <!-- ENDBILDSCHIRM -->
     <div id="end-screen" class="hidden">
-        <div class="trophy">🏆</div>
-        <div class="winner-text" id="winner-headline">Sieg!</div>
-        <p id="final-stats" style="font-size: 1.3rem; margin-bottom: 25px;"></p>
-        <button class="start-btn" onclick="resetToMenu()">REVANCHE! 🔄</button>
+        <div class="trophy" id="trophy">🏆</div>
+        <div class="winner-text" id="winner-headline"></div>
+        <div class="result-list" id="result-list"></div>
+        <p id="final-stats" style="font-size: 1.15rem; margin: 0 0 20px 0;"></p>
+        <div class="end-buttons">
+            <button class="start-btn" onclick="startGame()">NOCHMAL! 🔄</button>
+            <button class="secondary-btn" onclick="resetToMenu()">🏠 Menü</button>
+        </div>
     </div>
 </div>
 
 <script>
-    let level = 1;
-    let mode = 'versus'; // 'versus' oder 'coop'
-    let currentPlayer = 1; // 1 = Ilian, 2 = Johan
-    let scores = { 1: 0, 2: 0, coop: 0 };
-    let turnsPlayed = 0;
-    const maxTurnsVersus = 20; // 10 Schüsse pro Spieler
-    const targetCoopGoals = 10;
-    let currentAnswer = 0;
-    let isLocked = false;
-    let taskType = 'calc'; // 'calc', 'story' oder 'mixed'
-    let isStory = false;
-    let currentEquation = '';
+    // ================= Einstellungen =================
+    const PLAYERS = [
+        { id: 'ilian', name: 'Ilian', color: '#0288d1', dot: '🔵',
+          stars: ['Lionel Messi 🐐', 'Kylian Mbappé ⚡', 'Erling Haaland 🤖', 'Lamine Yamal 🌟', 'David Alaba 🇦🇹'] },
+        { id: 'johan', name: 'Johan', color: '#d32f2f', dot: '🔴',
+          stars: ['Cristiano Ronaldo 🚀', 'Jude Bellingham 👑', 'Vinícius Júnior 🔥', 'Jamal Musiala ✨', 'Marko Arnautović 🇦🇹'] },
+        { id: 'helena', name: 'Helena', color: '#8e24aa', dot: '🟣',
+          stars: ['Aitana Bonmatí ✨', 'Alexia Putellas 👑', 'Sarah Puntigam 🇦🇹', 'Giulia Gwinn ⚡', 'Lionel Messi 🐐'] }
+    ];
 
-    // Hilfsfunktion: Einzahl oder Mehrzahl
+    const LEVELS = {
+        1: { name: 'Rookie', icon: '🥉', desc: '1er, 2er, 5er, 10er' },
+        2: { name: 'Profi', icon: '🥈', desc: '+ 3er & 4er Reihe' },
+        3: { name: 'Weltmeister', icon: '🥇', desc: 'Alle 1x1 Reihen' }
+    };
+
+    const WINS_TO_UNLOCK = 2;        // So oft muss eine Stufe geschafft werden
+    const SHOTS_PER_PLAYER = 10;     // Aufgaben pro Kind (Duell & Solo)
+    const PASS_CORRECT = 7;          // Mindestens so viele richtig = geschafft
+    const COOP_GOALS_PER_PLAYER = 5; // Team-Pokal: Tor-Ziel pro Kind
+
+    const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ================= Speicher (nur auf diesem Gerät) =================
+    function load(key, fallback) {
+        try {
+            const v = localStorage.getItem(key);
+            return v ? JSON.parse(v) : fallback;
+        } catch (e) { return fallback; }
+    }
+    function save(key, value) {
+        try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; }
+    }
+
+    let progress = load('arena-progress', {});   // { ilian: { 1: 2, 2: 0 } }
+    let settings = Object.assign(
+        { selected: ['ilian', 'johan'], captains: {}, level: 1, mode: 'versus', task: 'calc' },
+        load('arena-settings', {})
+    );
+    const photos = {};
+    PLAYERS.forEach(p => { const ph = load('arena-photo-' + p.id, null); if (ph) photos[p.id] = ph; });
+
+    const saveSettings = () => save('arena-settings', settings);
+    const P = id => PLAYERS.find(p => p.id === id);
+    const selectedPlayers = () => PLAYERS.filter(p => settings.selected.includes(p.id));
+    const wins = (pid, lvl) => (progress[pid] && progress[pid][lvl]) || 0;
+    const isUnlocked = (pid, lvl) => lvl === 1 || wins(pid, lvl - 1) >= WINS_TO_UNLOCK;
+    const levelOpen = lvl => selectedPlayers().every(p => isUnlocked(p.id, lvl));
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+    // "Ilian", "Ilian & Johan", "Ilian, Johan & Helena"
+    const joinNames = arr => arr.length < 2 ? arr.join('') : arr.slice(0, -1).join(', ') + ' & ' + arr[arr.length - 1];
+
+    // Name des Kapitäns ohne Emoji, z.B. "Lionel Messi"
+    function captainName(pid) {
+        return (settings.captains[pid] || P(pid).stars[0]).replace(/\s+\S+$/, '');
+    }
+
+    function avatarHTML(pid, size) {
+        const p = P(pid);
+        if (photos[pid]) {
+            return `<img class="avatar ${size}" style="--pc:${p.color}" src="${photos[pid]}" alt="${p.name}">`;
+        }
+        return `<span class="avatar ${size}" style="--pc:${p.color}">${p.name[0]}</span>`;
+    }
+
+    function progressHTML(pid) {
+        return [1, 2, 3].map(l => {
+            const w = wins(pid, l);
+            if (!isUnlocked(pid, l)) return `<span>${LEVELS[l].icon} 🔒</span>`;
+            const shown = Math.min(w, WINS_TO_UNLOCK);
+            const extra = w > WINS_TO_UNLOCK ? ` +${w - WINS_TO_UNLOCK}` : '';
+            return `<span>${LEVELS[l].icon} ${'⭐'.repeat(shown)}${'☆'.repeat(WINS_TO_UNLOCK - shown)}${extra}</span>`;
+        }).join('');
+    }
+
+    // ================= Fotos =================
+    function handlePhoto(pid, file) {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+            // Quadratisch zuschneiden und verkleinern, damit es in den Speicher passt
+            const s = Math.min(img.width, img.height);
+            const c = document.createElement('canvas');
+            c.width = c.height = 200;
+            c.getContext('2d').drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, 200, 200);
+            URL.revokeObjectURL(url);
+            photos[pid] = c.toDataURL('image/jpeg', 0.85);
+            if (!save('arena-photo-' + pid, photos[pid])) {
+                showSetupError('Das Foto konnte nicht dauerhaft gespeichert werden – es gilt nur bis zum Neuladen.');
+            }
+            renderSetup();
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); showSetupError('Dieses Bild konnte nicht geladen werden.'); };
+        img.src = url;
+    }
+
+    function removePhoto(pid) {
+        delete photos[pid];
+        try { localStorage.removeItem('arena-photo-' + pid); } catch (e) {}
+        renderSetup();
+    }
+
+    // ================= Startbildschirm =================
+    function showSetupError(msg) {
+        document.getElementById('setup-error').innerText = msg;
+    }
+
+    function togglePlayer(pid) {
+        if (settings.selected.includes(pid)) {
+            settings.selected = settings.selected.filter(id => id !== pid);
+        } else {
+            settings.selected.push(pid);
+        }
+        showSetupError('');
+        saveSettings();
+        renderSetup();
+    }
+
+    function lockHint(lvl) {
+        const prev = LEVELS[lvl - 1].name;
+        return '🔒 ' + selectedPlayers()
+            .filter(p => !isUnlocked(p.id, lvl))
+            .map(p => {
+                if (!isUnlocked(p.id, lvl - 1)) return `${p.name}: erst ${prev} freispielen`;
+                return `${p.name}: noch ${WINS_TO_UNLOCK - wins(p.id, lvl - 1)}× ${prev}`;
+            })
+            .join(', ');
+    }
+
+    function renderChoices(containerId, items, current, onPick) {
+        const box = document.getElementById(containerId);
+        box.innerHTML = '';
+        items.forEach(it => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'choice-btn' + (it.val === current ? ' active' : '') + (it.locked ? ' locked' : '');
+            b.dataset.val = it.val;
+            b.innerHTML = `${it.label}<br><small>${it.sub}</small>`;
+            b.onclick = () => {
+                if (it.locked) {
+                    b.classList.remove('shake');
+                    void b.offsetWidth;
+                    b.classList.add('shake');
+                    return;
+                }
+                onPick(it.val);
+            };
+            box.appendChild(b);
+        });
+    }
+
+    function renderSetup() {
+        // Spieler-Karten
+        const wrap = document.getElementById('player-setup');
+        wrap.innerHTML = '';
+        PLAYERS.forEach(p => {
+            const on = settings.selected.includes(p.id);
+            const cap = settings.captains[p.id] || p.stars[0];
+            const card = document.createElement('div');
+            card.className = 'player-card' + (on ? ' selected' : '');
+            card.dataset.pid = p.id;
+            card.style.setProperty('--pc', p.color);
+            card.innerHTML = `
+                <button class="join-btn" type="button">${on ? '✅ Spielt mit' : '➕ Mitspielen'}</button>
+                <div>${avatarHTML(p.id, 'avatar-lg')}</div>
+                <div class="photo-actions">
+                    <label class="photo-btn">📷 Foto<input type="file" accept="image/*" hidden></label>
+                    ${photos[p.id] ? '<button class="photo-del" type="button" title="Foto entfernen">🗑️</button>' : ''}
+                </div>
+                <h3>${p.dot} ${p.name}</h3>
+                <label class="cap-label">Kapitän:</label>
+                <select>${p.stars.map(s => `<option${s === cap ? ' selected' : ''}>${s}</option>`).join('')}</select>
+                <div class="progress-line">${progressHTML(p.id)}</div>`;
+            card.querySelector('.join-btn').onclick = () => togglePlayer(p.id);
+            card.querySelector('input[type=file]').onchange = e => {
+                if (e.target.files && e.target.files[0]) handlePhoto(p.id, e.target.files[0]);
+            };
+            const del = card.querySelector('.photo-del');
+            if (del) del.onclick = () => removePhoto(p.id);
+            card.querySelector('select').onchange = e => { settings.captains[p.id] = e.target.value; saveSettings(); };
+            wrap.appendChild(card);
+        });
+
+        // Stufe: auf die höchste freie Stufe zurückfallen, falls gesperrt
+        while (settings.level > 1 && !levelOpen(settings.level)) settings.level--;
+        renderChoices('level-group', [1, 2, 3].map(l => ({
+            val: l,
+            label: `${LEVELS[l].icon} ${LEVELS[l].name}`,
+            sub: levelOpen(l) ? LEVELS[l].desc : lockHint(l),
+            locked: !levelOpen(l)
+        })), settings.level, v => { settings.level = v; saveSettings(); renderSetup(); });
+
+        // Modus abhängig von der Anzahl der Kinder
+        const n = selectedPlayers().length;
+        let modes;
+        if (n <= 1) {
+            settings.mode = 'solo';
+            modes = [{ val: 'solo', label: '🎯 Solo-Training', sub: `${SHOTS_PER_PLAYER} Schüsse – schaffst du ${PASS_CORRECT}?` }];
+        } else {
+            if (settings.mode === 'solo') settings.mode = 'versus';
+            modes = [
+                { val: 'versus', label: '⚔️ Elfmeter-Duell', sub: `${n === 2 ? '1 gegen 1' : 'Jeder gegen jeden'} – je ${SHOTS_PER_PLAYER} Schüsse` },
+                { val: 'coop', label: '🤝 Team-Pokal', sub: `Gemeinsam ${n * COOP_GOALS_PER_PLAYER} Tore schießen` }
+            ];
+        }
+        renderChoices('mode-group', modes, settings.mode, v => { settings.mode = v; saveSettings(); renderSetup(); });
+
+        renderChoices('task-group', [
+            { val: 'calc', label: '🔢 Rechnen', sub: 'z.B. 4 × 5 = ?' },
+            { val: 'story', label: '📖 Textaufgaben', sub: 'Fußball-Geschichten mit Bild' },
+            { val: 'mixed', label: '🎲 Gemischt', sub: 'Beides abwechselnd' }
+        ], settings.task, v => { settings.task = v; saveSettings(); renderSetup(); });
+    }
+
+    function unlockAll() {
+        PLAYERS.forEach(p => {
+            progress[p.id] = progress[p.id] || {};
+            [1, 2].forEach(l => { progress[p.id][l] = Math.max(wins(p.id, l), WINS_TO_UNLOCK); });
+        });
+        save('arena-progress', progress);
+        renderSetup();
+    }
+
+    function resetProgress() {
+        if (!confirm('Wirklich alle Sterne von allen Kindern löschen?')) return;
+        progress = {};
+        save('arena-progress', progress);
+        settings.level = 1;
+        saveSettings();
+        renderSetup();
+    }
+
+    // ================= Textaufgaben =================
     const pl = (n, one, many) => n === 1 ? one : many;
 
-    // Fußball-Rechengeschichten: a = Anzahl der Gruppen, b = Anzahl pro Gruppe
-    // n = Name des Kindes, star = gewählter Kapitän
+    // a = Anzahl der Gruppen, b = Anzahl pro Gruppe, n = Name des Kindes, star = Kapitän
     const STORIES = [
         { icon: '⭐', text: (a, b, n) => `${n} kauft ${a} ${pl(a, 'Packung', 'Packungen')} Fußball-Sticker. In jeder Packung ${pl(b, 'ist 1 Sticker', `sind ${b} Sticker`)}. Wie viele Sticker sind das zusammen?` },
         { icon: '⚽', text: (a, b) => `Der Zeugwart füllt ${a} ${pl(a, 'Ballnetz', 'Ballnetze')}. In jedes Netz kommen ${b} ${pl(b, 'Ball', 'Bälle')}. Wie viele Bälle sind das?` },
@@ -472,7 +951,7 @@
         { icon: '🟠', text: (a, b) => `Beim Training stellt der Trainer ${a} ${pl(a, 'Reihe', 'Reihen')} mit je ${b} Hütchen auf. Wie viele Hütchen sind das?` },
         { icon: '🧣', text: (a, b) => `Im Fanshop liegen ${a} Stapel mit je ${b} ${pl(b, 'Schal', 'Schals')}. Wie viele Schals sind es insgesamt?` },
         { icon: '✍️', text: (a, b, n, star) => `${star} schreibt für ${a} ${pl(a, 'Kind', 'Kinder')} je ${b} ${pl(b, 'Autogramm', 'Autogramme')}. Wie viele Autogramme sind das?` },
-        { icon: '🎯', text: (a, b, n) => `Bei der Torwand bringt jeder Treffer ${b} ${pl(b, 'Punkt', 'Punkte')}. ${n} trifft ${a === 1 ? 'einmal' : a + '\u2011mal'}. Wie viele Punkte bekommt ${n}?` },
+        { icon: '🎯', text: (a, b, n) => `Bei der Torwand bringt jeder Treffer ${b} ${pl(b, 'Punkt', 'Punkte')}. ${n} trifft ${a === 1 ? 'einmal' : a + '‑mal'}. Wie viele Punkte bekommt ${n}?` },
         { icon: '🥤', text: (a, b) => `In einer Getränkekiste stehen ${a} ${pl(a, 'Reihe', 'Reihen')} mit je ${b} ${pl(b, 'Flasche', 'Flaschen')}. Wie viele Flaschen sind in der Kiste?` },
         { icon: '💶', text: (a, b, n) => `Ein Fußball-Poster kostet ${b} Euro. ${n} kauft ${a} Poster. Wie viel Euro muss ${n} bezahlen?` },
         { icon: '👟', text: (a, b) => `In der Kabine stehen ${a} ${pl(a, 'Regal', 'Regale')}. In jedem Regal ${pl(b, 'steht 1 Fußballschuh', `stehen ${b} Fußballschuhe`)}. Wie viele Schuhe sind das?` },
@@ -480,41 +959,10 @@
         { icon: '🍕', text: (a, b) => `Nach dem Sieg gibt es Pizza! Auf ${a} ${pl(a, 'Teller', 'Tellern')} liegen je ${b} ${pl(b, 'Stück', 'Stücke')}. Wie viele Stücke sind das?` }
     ];
 
-    // Auswahl-Buttons aktivieren
-    document.querySelectorAll('#level-group .choice-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('#level-group .choice-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            level = parseInt(btn.dataset.val);
-        });
-    });
-
-    document.querySelectorAll('#mode-group .choice-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('#mode-group .choice-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            mode = btn.dataset.val;
-        });
-    });
-
-    document.querySelectorAll('#task-group .choice-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('#task-group .choice-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            taskType = btn.dataset.val;
-        });
-    });
-
-    // Name des Kapitäns ohne Emoji, z.B. "Lionel Messi"
-    function starFullName(player) {
-        const id = player === 1 ? 'star-ilian' : 'star-johan';
-        return document.getElementById(id).value.replace(/\s+\S+$/, '');
-    }
-
     function renderStory(a, b) {
-        const story = STORIES[Math.floor(Math.random() * STORIES.length)];
-        const name = currentPlayer === 1 ? 'Ilian' : 'Johan';
-        document.getElementById('story-text').innerText = story.text(a, b, name, starFullName(currentPlayer));
+        const story = pick(STORIES);
+        const pid = currentPid();
+        document.getElementById('story-text').innerText = story.text(a, b, P(pid).name, captainName(pid));
         document.getElementById('story-solution').innerText = '';
 
         // Bild: a Gruppen mit je b Symbolen
@@ -548,30 +996,83 @@
         document.getElementById('read-btn').classList.add('hidden');
     }
 
+    // ================= Animationen =================
+    (function buildCrowd() {
+        const fans = ['🙋', '🧒', '👦', '👧', '🧑', '👨', '👩', '🙌', '🧔', '👱'];
+        const crowd = document.getElementById('crowd');
+        const count = Math.max(10, Math.min(30, Math.round(window.innerWidth / 45)));
+        for (let i = 0; i < count; i++) {
+            const f = document.createElement('span');
+            f.className = 'fan';
+            f.innerText = fans[i % fans.length];
+            f.style.animationDelay = (i * 0.1) + 's'; // La-Ola-Welle
+            crowd.appendChild(f);
+        }
+    })();
+
+    function confetti(count) {
+        if (reduceMotion) return;
+        const box = document.getElementById('confetti');
+        const bits = ['🎉', '⭐', '✨', '⚽', '🎊', '🏆'];
+        for (let i = 0; i < count; i++) {
+            const s = document.createElement('span');
+            s.className = 'conf';
+            s.innerText = pick(bits);
+            s.style.left = (Math.random() * 100) + 'vw';
+            s.style.animationDuration = (1.4 + Math.random() * 1.4) + 's';
+            s.style.animationDelay = (Math.random() * 0.4) + 's';
+            box.appendChild(s);
+            setTimeout(() => s.remove(), 3500);
+        }
+    }
+
+    function cheer(ms) {
+        document.body.classList.add('cheer');
+        clearTimeout(cheer.t);
+        cheer.t = setTimeout(() => document.body.classList.remove('cheer'), ms);
+    }
+
+    function resetPitch() {
+        const pitch = document.getElementById('mini-pitch');
+        pitch.classList.add('no-anim');
+        pitch.classList.remove('hit', 'saved');
+        void pitch.offsetWidth;
+        pitch.classList.remove('no-anim');
+    }
+
+    // ================= Spiel =================
+    let game = null;
+    let currentAnswer = 0;
+    let currentEquation = '';
+    let isStory = false;
+    let isLocked = false;
+
+    const currentPid = () => game.players[game.turn % game.players.length];
+    const totalAsked = () => game.players.reduce((s, id) => s + game.stats[id].asked, 0);
+    const coopTarget = () => game.players.length * COOP_GOALS_PER_PLAYER;
+
     function startGame() {
-        scores = { 1: 0, 2: 0, coop: 0 };
-        turnsPlayed = 0;
-        currentPlayer = 1;
-        isLocked = false;
+        const sel = selectedPlayers();
+        if (!sel.length) {
+            showSetupError('Bitte zuerst auswählen, wer mitspielt! 👆');
+            return;
+        }
+        if (!levelOpen(settings.level)) settings.level = 1;
 
-        const star1 = document.getElementById('star-ilian').value;
-        const star2 = document.getElementById('star-johan').value;
-
-        document.getElementById('badge-p1').innerText = star1;
-        document.getElementById('badge-p2').innerText = star2;
-        document.getElementById('badge-coop').innerText = star1 + " & " + star2;
+        game = {
+            players: sel.map(p => p.id),
+            level: settings.level,
+            mode: sel.length === 1 ? 'solo' : settings.mode,
+            task: settings.task,
+            turn: 0,
+            teamGoals: 0,
+            stats: {}
+        };
+        sel.forEach(p => { game.stats[p.id] = { correct: 0, asked: 0 }; });
 
         document.getElementById('setup-screen').classList.add('hidden');
         document.getElementById('end-screen').classList.add('hidden');
         document.getElementById('game-screen').classList.remove('hidden');
-
-        if (mode === 'versus') {
-            document.getElementById('scoreboard-versus').classList.remove('hidden');
-            document.getElementById('scoreboard-coop').classList.add('hidden');
-        } else {
-            document.getElementById('scoreboard-versus').classList.add('hidden');
-            document.getElementById('scoreboard-coop').classList.remove('hidden');
-        }
 
         updateUI();
         generateQuestion();
@@ -579,21 +1080,21 @@
 
     function getAllowedTables() {
         // Typischer Stoff der 2. Klasse Volksschule Österreich
-        if (level === 1) return [1, 2, 5, 10]; // Kernaufgaben
-        if (level === 2) return [1, 2, 3, 4, 5, 10]; // Erweiterung
-        return [2, 3, 4, 5, 6, 7, 8, 9, 10]; // Alle Reihen (ohne 1er damit es spannend bleibt)
+        if (game.level === 1) return [1, 2, 5, 10];
+        if (game.level === 2) return [1, 2, 3, 4, 5, 10];
+        return [2, 3, 4, 5, 6, 7, 8, 9, 10];
     }
 
     function generateQuestion() {
         isLocked = false;
         document.getElementById('feedback-text').innerText = '';
-        document.getElementById('soccer-ball').classList.remove('goal-scored');
+        resetPitch();
 
-        isStory = taskType === 'story' || (taskType === 'mixed' && Math.random() < 0.5);
+        isStory = game.task === 'story' || (game.task === 'mixed' && Math.random() < 0.5);
 
         // Bei Textaufgaben ohne "× 1" – die Geschichten sollen echte Gruppen zeigen
         const tables = getAllowedTables().filter(t => !isStory || t !== 1);
-        const table = tables[Math.floor(Math.random() * tables.length)];
+        const table = pick(tables);
         const multiplier = isStory
             ? Math.floor(Math.random() * 9) + 2
             : Math.floor(Math.random() * 10) + 1;
@@ -620,21 +1121,17 @@
         }
 
         // 3 plausible Falschantworten erzeugen
-        let options = new Set([currentAnswer]);
+        const options = new Set([currentAnswer]);
         while (options.size < 4) {
             let offset = (Math.floor(Math.random() * 5) - 2) * (Math.random() > 0.5 ? table : 1);
             if (offset === 0) offset = Math.floor(Math.random() * 4) + 1;
-            let wrong = currentAnswer + offset;
-            if (wrong > 0 && wrong !== currentAnswer) {
-                options.add(wrong);
-            }
+            const wrong = currentAnswer + offset;
+            if (wrong > 0 && wrong !== currentAnswer) options.add(wrong);
         }
 
-        // Mischen und Buttons bauen
         const shuffled = Array.from(options).sort(() => Math.random() - 0.5);
         const container = document.getElementById('answers-container');
         container.innerHTML = '';
-
         shuffled.forEach(num => {
             const btn = document.createElement('button');
             btn.className = 'ans-btn';
@@ -648,93 +1145,118 @@
         if (isLocked) return;
         isLocked = true;
 
-        const playerName = currentPlayer === 1 ? "Ilian" : "Johan";
-        const starName = currentPlayer === 1 
-            ? document.getElementById('star-ilian').value.split(' ')[1] 
-            : document.getElementById('star-johan').value.split(' ')[1];
-
+        const pid = currentPid();
+        const name = P(pid).name;
         const feedback = document.getElementById('feedback-text');
-        const ball = document.getElementById('soccer-ball');
+        const pitch = document.getElementById('mini-pitch');
+        const correct = selected === currentAnswer;
 
-        if (selected === currentAnswer) {
+        game.stats[pid].asked++;
+
+        if (correct) {
+            game.stats[pid].correct++;
+            if (game.mode === 'coop') game.teamGoals++;
             btnElement.classList.add('correct');
-            ball.classList.add('goal-scored');
-            const cheers = [
-                `TOOOOR! Traumschuss von ${playerName}! ⚽🔥`,
-                `WELTKLASSE! Genau wie ${starName}! 🌟`,
-                `UNHALTBAR ins Kreuzeck, ${playerName}! 🚀`,
+            pitch.classList.add('hit');
+            cheer(1500);
+            confetti(18);
+            feedback.innerText = pick([
+                `TOOOOR! Traumschuss von ${name}! ⚽🔥`,
+                `WELTKLASSE! Genau wie ${captainName(pid)}! 🌟`,
+                `UNHALTBAR ins Kreuzeck, ${name}! 🚀`,
                 `SUPER GEMACHT! Ein echtes Traumtor! 🎉`
-            ];
-            feedback.innerText = cheers[Math.floor(Math.random() * cheers.length)];
+            ]);
             feedback.style.color = '#00e676';
-
-            if (mode === 'versus') {
-                scores[currentPlayer]++;
-            } else {
-                scores.coop++;
-            }
         } else {
             btnElement.classList.add('wrong');
-            // Richtige Lösung grün markieren
+            pitch.classList.add('saved');
             document.querySelectorAll('.ans-btn').forEach(b => {
                 if (parseInt(b.innerText) === currentAnswer) b.classList.add('correct');
             });
-            feedback.innerText = `Knapp vorbei! Richtig wäre ${currentAnswer} gewesen. 🧤`;
+            feedback.innerText = `Gehalten! Richtig wäre ${currentAnswer} gewesen. 🧤`;
             feedback.style.color = '#ff8a80';
         }
 
-        // Bei Textaufgaben die passende Rechnung zeigen
         if (isStory) {
             document.getElementById('story-solution').innerText = `📝 ${currentEquation}`;
         }
 
-        turnsPlayed++;
         updateUI();
 
-        // Bei falschen Textaufgaben etwas länger warten, damit man Bild & Rechnung anschauen kann
-        const delay = (isStory && selected !== currentAnswer) ? 3500 : (isStory ? 2500 : 1800);
+        // Bei Textaufgaben etwas länger warten, damit man Bild & Rechnung anschauen kann
+        const delay = isStory ? (correct ? 2500 : 3500) : 1800;
         setTimeout(() => {
             if (checkGameOver()) {
                 showEndScreen();
             } else {
-                currentPlayer = currentPlayer === 1 ? 2 : 1;
+                game.turn++;
                 updateUI();
                 generateQuestion();
             }
         }, delay);
     }
 
-    function updateUI() {
-        document.getElementById('score-p1').innerText = scores[1];
-        document.getElementById('score-p2').innerText = scores[2];
-        document.getElementById('score-coop').innerText = scores.coop;
-
-        const round = Math.min(10, Math.floor(turnsPlayed / 2) + 1);
-        document.getElementById('round-num').innerText = round;
-
-        const banner = document.getElementById('turn-indicator');
-        const card1 = document.getElementById('card-p1');
-        const card2 = document.getElementById('card-p2');
-
-        if (currentPlayer === 1) {
-            banner.innerText = "🔵 Ilian ist am Ball!";
-            banner.className = "turn-banner turn-ilian";
-            card1.classList.add('active-turn');
-            card2.classList.remove('active-turn');
-        } else {
-            banner.innerText = "🔴 Johan ist am Ball!";
-            banner.className = "turn-banner turn-johan";
-            card2.classList.add('active-turn');
-            card1.classList.remove('active-turn');
-        }
+    function checkGameOver() {
+        if (game.mode === 'coop') return game.teamGoals >= coopTarget();
+        return totalAsked() >= game.players.length * SHOTS_PER_PLAYER;
     }
 
-    function checkGameOver() {
-        if (mode === 'versus') {
-            return turnsPlayed >= maxTurnsVersus;
+    function updateUI() {
+        const pid = currentPid();
+        const board = document.getElementById('scoreboard');
+
+        if (game.mode === 'coop') {
+            board.innerHTML = `
+                <div class="team-score">
+                    <div class="team-avatars">${game.players.map(id => avatarHTML(id, 'avatar-md')).join('')}</div>
+                    <span class="team-name">Team ${joinNames(game.players.map(id => P(id).name))}</span>
+                    <span class="star-badge">${totalAsked()} Versuche</span>
+                </div>
+                <div class="team-score">
+                    <span class="team-name">Tore (Ziel: ${coopTarget()})</span>
+                    <span class="goals">${game.teamGoals}</span>
+                </div>`;
         } else {
-            return scores.coop >= targetCoopGoals;
+            const n = game.players.length;
+            const round = Math.min(SHOTS_PER_PLAYER, Math.floor(game.turn / n) + 1);
+            const cards = game.players.map(id => `
+                <div class="team-score${id === pid ? ' active-turn' : ''}">
+                    ${avatarHTML(id, 'avatar-md')}
+                    <span class="team-name">${P(id).dot} ${P(id).name}</span>
+                    <span class="star-badge">${captainName(id)}</span>
+                    <span class="goals">${game.stats[id].correct}</span>
+                </div>`);
+            const roundBox = `<div class="round-box"><div>Runde</div><div>${round} / ${SHOTS_PER_PLAYER}</div><div style="font-size:1.4rem">⚽</div></div>`;
+            if (n === 2) {
+                board.innerHTML = cards[0] + roundBox + cards[1];
+            } else {
+                board.innerHTML = cards.join('') + roundBox;
+            }
         }
+
+        const banner = document.getElementById('turn-indicator');
+        banner.innerHTML = `${avatarHTML(pid, 'avatar-sm')} ${P(pid).name} ist am Ball!`;
+        banner.style.background = P(pid).color;
+    }
+
+    // Stern vergeben und neue Stufen melden
+    function awardStar(pid) {
+        const lvl = game.level;
+        const before = lvl < 3 && isUnlocked(pid, lvl + 1);
+        progress[pid] = progress[pid] || {};
+        progress[pid][lvl] = wins(pid, lvl) + 1;
+        const after = lvl < 3 && isUnlocked(pid, lvl + 1);
+        const w = wins(pid, lvl);
+
+        let msg = `⭐ ${LEVELS[lvl].name} geschafft! (${w}×)`;
+        if (lvl < 3 && !before && after) {
+            msg += ` <span class="unlock-msg">🔓 ${LEVELS[lvl + 1].icon} ${LEVELS[lvl + 1].name} ist jetzt frei!</span>`;
+            return { msg, unlocked: true };
+        }
+        if (lvl < 3 && !after) {
+            msg += ` Noch ${WINS_TO_UNLOCK - w}× bis ${LEVELS[lvl + 1].name}.`;
+        }
+        return { msg, unlocked: false };
     }
 
     function showEndScreen() {
@@ -743,26 +1265,89 @@
 
         const headline = document.getElementById('winner-headline');
         const stats = document.getElementById('final-stats');
+        const list = document.getElementById('result-list');
+        const trophy = document.getElementById('trophy');
+        const names = game.players.map(id => P(id).name);
+        const rows = [];
+        let anyUnlock = false;
+        stats.innerText = '';
 
-        if (mode === 'versus') {
-            if (scores[1] > scores[2]) {
-                headline.innerText = "🏆 ILIAN GEWINNT DEN POKAL! 🏆";
-            } else if (scores[2] > scores[1]) {
-                headline.innerText = "🏆 JOHAN GEWINNT DEN POKAL! 🏆";
-            } else {
-                headline.innerText = "🤝 UNENTSCHIEDEN! BEIDE SIND CHAMPIONS! 🤝";
-            }
-            stats.innerText = `Endstand: Ilian ${scores[1]} : ${scores[2]} Johan`;
+        if (game.mode === 'coop') {
+            const attempts = totalAsked();
+            const maxAttempts = Math.ceil(coopTarget() * SHOTS_PER_PLAYER / PASS_CORRECT);
+            const passed = attempts <= maxAttempts;
+            headline.innerText = '🏆 TEAM-WELTMEISTER! 🏆';
+            trophy.innerText = '🏆';
+            stats.innerText = `${joinNames(names)} haben gemeinsam ${coopTarget()} Tore in ${attempts} Versuchen geschossen!`;
+            game.players.forEach(id => {
+                let msg;
+                if (passed) {
+                    const r = awardStar(id);
+                    anyUnlock = anyUnlock || r.unlocked;
+                    msg = r.msg;
+                } else {
+                    msg = `Für einen ⭐ braucht das Team höchstens ${maxAttempts} Versuche – nochmal!`;
+                }
+                rows.push({ id, score: `${game.stats[id].correct} ⚽`, msg });
+            });
         } else {
-            headline.innerText = "🏆 TEAM-WELTMEISTER! 🏆";
-            stats.innerText = `Ilian & Johan haben gemeinsam 10 Tore in ${turnsPlayed} Versuchen geschossen!`;
+            game.players.forEach(id => {
+                const c = game.stats[id].correct;
+                let msg;
+                if (c >= PASS_CORRECT) {
+                    const r = awardStar(id);
+                    anyUnlock = anyUnlock || r.unlocked;
+                    msg = r.msg;
+                } else {
+                    msg = `Für einen ⭐ braucht man ${PASS_CORRECT} von ${SHOTS_PER_PLAYER}. Fast!`;
+                }
+                rows.push({ id, score: `${c} / ${SHOTS_PER_PLAYER}`, msg, c });
+            });
+
+            if (game.mode === 'solo') {
+                const ok = rows[0].c >= PASS_CORRECT;
+                trophy.innerText = ok ? '🏆' : '💪';
+                headline.innerText = ok ? `⭐ STARK, ${names[0].toUpperCase()}! ⭐` : `💪 WEITER SO, ${names[0].toUpperCase()}!`;
+            } else {
+                rows.sort((x, y) => y.c - x.c);
+                const best = rows[0].c;
+                const winners = rows.filter(r => r.c === best).map(r => P(r.id).name.toUpperCase());
+                trophy.innerText = '🏆';
+                if (winners.length === 1) {
+                    headline.innerText = `🏆 ${winners[0]} GEWINNT DEN POKAL! 🏆`;
+                } else if (winners.length === game.players.length) {
+                    headline.innerText = '🤝 UNENTSCHIEDEN! ALLE SIND CHAMPIONS! 🤝';
+                } else {
+                    headline.innerText = `🤝 ${joinNames(winners)} TEILEN SICH DEN POKAL!`;
+                }
+            }
         }
+
+        save('arena-progress', progress);
+
+        list.innerHTML = rows.map(r => `
+            <div class="result-row" style="--pc:${P(r.id).color}">
+                ${avatarHTML(r.id, 'avatar-md')}
+                <div class="r-main">
+                    <div class="r-name">${P(r.id).dot} ${P(r.id).name}</div>
+                    <div class="r-msg">${r.msg}</div>
+                </div>
+                <div class="r-score">${r.score}</div>
+            </div>`).join('');
+
+        cheer(anyUnlock ? 4000 : 2500);
+        confetti(anyUnlock ? 60 : 35);
     }
 
     function resetToMenu() {
+        if ('speechSynthesis' in window) speechSynthesis.cancel();
         document.getElementById('end-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.add('hidden');
         document.getElementById('setup-screen').classList.remove('hidden');
+        renderSetup();
     }
+
+    renderSetup();
 </script>
 
 </body>
