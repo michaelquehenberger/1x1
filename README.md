@@ -58,7 +58,7 @@ Auf Android: Link in Chrome öffnen → Menü ⋮ → **„App installieren“**
 
 ## 🕐 Uhr-Training
 
-Im Startbildschirm bei **„Was üben wir?“** auf **🕐 Uhr-Training** tippen. Das Ziffernblatt ist die **„Uhr von Messi“, „Uhr von Ronaldo“** usw. – in der Farbe des Kindes und mit dem Namen seines Kapitäns. Der kleine Zeiger (Stunden) ist **blau**, der große Zeiger (Minuten) **rot**.
+Im Startbildschirm bei **„Was üben wir?“** auf **🕐 Uhr-Training** tippen. Das Ziffernblatt ist die **„Uhr von Messi“, „Uhr von Ronaldo“** usw. – in der Farbe des Kindes und mit dem Namen seines Kapitäns. Der kleine Zeiger (Stunden) ist **rot**, der große Zeiger (Minuten) **blau**.
 
 **Uhr-Stufen:**
 
