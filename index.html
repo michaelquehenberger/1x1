@@ -839,6 +839,116 @@
             align-items: center;
         }
 
+        /* ---------- Uhr-Training ---------- */
+        .clock-box { margin: 0 0 14px 0; }
+
+        .clock-title {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--gold);
+            margin-bottom: 4px;
+        }
+
+        .clock-context {
+            display: inline-block;
+            font-size: 1.15rem;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 4px 14px;
+            margin-bottom: 6px;
+        }
+
+        .clock-svg {
+            display: block;
+            width: min(270px, 78vw);
+            height: auto;
+            margin: 6px auto;
+            filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
+        }
+
+        .clock-svg .hand {
+            transform-box: view-box;
+            transform-origin: 100px 100px;
+            transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 1);
+        }
+
+        .clock-svg .hit { fill: transparent; cursor: pointer; }
+        .clock-svg .hit:hover { fill: rgba(255, 215, 0, 0.35); }
+
+        .clock-prompt {
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin: 8px 0 12px 0;
+        }
+
+        .clock-prompt .num {
+            white-space: nowrap;
+            color: #000;
+            background: var(--gold);
+            border-radius: 8px;
+            padding: 0 8px;
+        }
+
+        .hand-pick {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .hand-btn {
+            font-size: 1rem;
+            padding: 8px 14px;
+            background: #37474f;
+            color: #fff;
+            border: 3px solid transparent;
+        }
+
+        .hand-btn.active { border-color: #fff; transform: scale(1.05); }
+        .hand-btn.h.active { background: #1565c0; }
+        .hand-btn.m.active { background: #d50000; }
+
+        .answers-grid.clock-answers .ans-btn { font-size: 1.5rem; padding: 16px 8px; }
+
+        .time-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            font-size: 2.4rem;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        .t-field {
+            background: #eceff1;
+            color: #102027;
+            border-radius: 14px;
+            min-width: 92px;
+            padding: 6px 10px;
+            border: 4px solid transparent;
+            cursor: pointer;
+        }
+
+        .t-field.active { border-color: var(--gold); }
+        .t-field.correct, .t-field.wrong { border-color: transparent; }
+        .t-label { display: block; font-size: 0.75rem; color: #607d8b; font-weight: bold; }
+
+        .keypad .key.wide { grid-column: span 3; }
+
+        .done-btn {
+            background: linear-gradient(45deg, #00c853, #64dd17);
+            color: #000;
+            font-size: 1.5rem;
+            padding: 12px 36px;
+            border-radius: 40px;
+            box-shadow: 0 5px 0 #1b5e20;
+        }
+
+        body.clock-game .pitch { max-width: 300px; }
+
         /* ---------- Sammelalbum ---------- */
         .modal {
             position: fixed;
@@ -941,33 +1051,49 @@
         <div class="subtitle">2. Klasse Volksschule – Ilian, Johan & Helena</div>
 
         <div class="setup-section">
-            <strong>1. Wer spielt mit?</strong>
+            <strong class="sec-title" data-t="Wer spielt mit?"></strong>
             <div class="player-setup" id="player-setup"></div>
         </div>
 
         <div class="setup-section">
-            <strong>2. Schwierigkeitsstufe:</strong>
+            <strong class="sec-title" data-t="Was üben wir?"></strong>
+            <div class="choice-group" id="game-group"></div>
+        </div>
+
+        <div class="setup-section clock-only">
+            <strong class="sec-title" data-t="Uhr-Stufe:"></strong>
+            <div class="choice-group" id="clocklevel-group"></div>
+            <div class="rule-hint">⭐ Geschafft = mindestens 7 von 10 richtig. Jeder Stern bringt einen Sticker fürs Album!</div>
+        </div>
+
+        <div class="setup-section math-only">
+            <strong class="sec-title" data-t="Schwierigkeitsstufe:"></strong>
             <div class="choice-group" id="level-group"></div>
             <div class="rule-hint">⭐ Geschafft = mindestens 7 von 10 richtig. 2 Sterne → nächste Stufe wird frei! Jeder Stern bringt einen Sticker fürs Album.</div>
         </div>
 
         <div class="setup-section">
-            <strong>3. Spielmodus:</strong>
+            <strong class="sec-title" data-t="Spielmodus:"></strong>
             <div class="choice-group" id="mode-group"></div>
         </div>
 
-        <div class="setup-section">
-            <strong>4. Aufgabenart:</strong>
+        <div class="setup-section math-only">
+            <strong class="sec-title" data-t="Aufgabenart:"></strong>
             <div class="choice-group" id="task-group"></div>
+        </div>
+
+        <div class="setup-section clock-only">
+            <strong class="sec-title" data-t="Uhr-Aufgabe:"></strong>
+            <div class="choice-group" id="clocktask-group"></div>
         </div>
 
         <div class="extras">
             <div class="setup-section">
-                <strong>5. Zeit:</strong>
+                <strong class="sec-title" data-t="Zeit:"></strong>
                 <div class="choice-group" id="timer-group"></div>
             </div>
-            <div class="setup-section">
-                <strong>6. Antworten:</strong>
+            <div class="setup-section math-only">
+                <strong class="sec-title" data-t="Antworten:"></strong>
                 <div class="choice-group" id="answer-group"></div>
             </div>
         </div>
@@ -1047,6 +1173,16 @@
                 <div class="story-visual" id="story-visual"></div>
                 <div class="story-solution" id="story-solution"></div>
             </div>
+            <div class="clock-box hidden" id="clock-box">
+                <div class="clock-title" id="clock-title"></div>
+                <div class="clock-context hidden" id="clock-context"></div>
+                <div id="clock-face"></div>
+                <div class="clock-prompt" id="clock-prompt"></div>
+                <div class="hand-pick hidden" id="hand-pick">
+                    <button class="hand-btn h" id="pick-h" type="button" onclick="pickHand('h')">🔵 Kleiner Zeiger<br><small>Stunden</small></button>
+                    <button class="hand-btn m" id="pick-m" type="button" onclick="pickHand('m')">🔴 Großer Zeiger<br><small>Minuten</small></button>
+                </div>
+            </div>
             <div id="answers-container"></div>
             <div class="feedback-overlay" id="feedback-text"></div>
         </div>
@@ -1111,6 +1247,14 @@
     const TIME_STORY = 15;           // Sekunden für Textaufgaben
     const REVIEW_CHANCE = 0.4;       // Wie oft eine "knifflige" Aufgabe wiederkommt
     const REVIEW_REPEATS = 2;        // So oft richtig, dann ist sie aus der Übungsliste
+    const TIME_CLOCK_READ = 10;      // Uhr ablesen & antippen
+    const TIME_CLOCK_WORK = 15;      // Uhr hinschreiben oder Zeiger stellen
+
+    const CLOCK_LEVELS = {
+        1: { name: 'Volle Stunden', icon: '🕐', desc: '7 Uhr, 3 Uhr …' },
+        2: { name: 'Halbe Stunden', icon: '🕧', desc: '+ halb 8, halb 4 …' },
+        3: { name: '24-Stunden-Uhr', icon: '🌙', desc: '7:00 früh oder 19:00 abends' }
+    };
 
     const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1129,7 +1273,8 @@
     let stats = load('arena-stats', {});         // { ilian: { f: { "3x7": {r, w} }, r: { "3x7": 2 } } }
     let settings = Object.assign(
         { selected: ['ilian', 'johan'], captains: {}, numbers: {}, level: 1, mode: 'versus',
-          task: 'calc', timer: false, answer: 'choice', sound: true },
+          task: 'calc', timer: false, answer: 'choice', sound: true,
+          game: 'math', clockLevel: 1, clockTask: 'read' },
         load('arena-settings', {})
     );
     settings.numbers = settings.numbers || {};
@@ -1195,8 +1340,10 @@
             const shown = Math.min(w, WINS_TO_UNLOCK);
             const extra = w > WINS_TO_UNLOCK ? ` +${w - WINS_TO_UNLOCK}` : '';
             return `<span>${LEVELS[l].icon} ${'⭐'.repeat(shown)}${'☆'.repeat(WINS_TO_UNLOCK - shown)}${extra}</span>`;
-        }).join('');
+        }).join('') + (clockStars(pid) ? `<span>🕐 ${clockStars(pid)}⭐</span>` : '');
     }
+
+    const clockStars = pid => [1, 2, 3].reduce((sum, l) => sum + ((progress[pid] && progress[pid]['c' + l]) || 0), 0);
 
     // ================= Ton (wird im Browser erzeugt, keine Dateien nötig) =================
     const Sound = {
@@ -1358,6 +1505,13 @@
         save('arena-stats', stats);
     }
 
+    function recordClock(pid, ok) {
+        const s = stats[pid] = stats[pid] || { f: {}, r: {} };
+        s.clock = s.clock || { r: 0, w: 0 };
+        ok ? s.clock.r++ : s.clock.w++;
+        save('arena-stats', stats);
+    }
+
     // Knifflige Aufgaben dieses Kindes, die zur aktuellen Stufe passen
     function reviewCandidates(pid, allowed, noOnes) {
         const s = stats[pid];
@@ -1371,8 +1525,10 @@
         const box = document.getElementById('parent-stats');
         box.innerHTML = PLAYERS.map(p => {
             const s = stats[p.id];
+            const clockLine = s && s.clock
+                ? `<div class="ps-review">🕐 Uhr: ${Math.round(s.clock.r / (s.clock.r + s.clock.w) * 100)}% richtig (${s.clock.r + s.clock.w}×)</div>` : '';
             if (!s || !Object.keys(s.f).length) {
-                return `<div class="ps-player"><b>${p.dot} ${p.name}</b><div style="margin-top:6px">Noch keine Aufgaben gespielt.</div></div>`;
+                return `<div class="ps-player"><b>${p.dot} ${p.name}</b><div style="margin-top:6px">${clockLine ? 'Noch keine 1x1-Aufgaben gespielt.' : 'Noch keine Aufgaben gespielt.'}</div>${clockLine}</div>`;
             }
             const rows = [];
             for (let t = 1; t <= 10; t++) {
@@ -1391,7 +1547,7 @@
             }
             const review = Object.keys(s.r).map(k => k.replace('x', ' × '));
             return `<div class="ps-player"><b>${p.dot} ${p.name}</b>${rows.join('')}
-                <div class="ps-review">🔁 Übt gerade: ${review.length ? review.join(', ') : 'nichts – alles sitzt! 🎉'}</div></div>`;
+                <div class="ps-review">🔁 Übt gerade: ${review.length ? review.join(', ') : 'nichts – alles sitzt! 🎉'}</div>${clockLine}</div>`;
         }).join('');
     }
 
@@ -1494,6 +1650,33 @@
             wrap.appendChild(card);
         });
 
+        // Spiel: 1x1 oder Uhr
+        const isClock = settings.game === 'clock';
+        renderChoices('game-group', [
+            { val: 'math', label: '⚽ 1x1-Training', sub: 'Malnehmen, Teilen, Textaufgaben' },
+            { val: 'clock', label: '🕐 Uhr-Training', sub: 'Uhr lesen & stellen' }
+        ], settings.game, v => { settings.game = v; saveSettings(); renderSetup(); });
+        document.querySelectorAll('.math-only').forEach(el => el.classList.toggle('hidden', isClock));
+        document.querySelectorAll('.clock-only').forEach(el => el.classList.toggle('hidden', !isClock));
+
+        renderChoices('clocklevel-group', [1, 2, 3].map(l => ({
+            val: l, label: `${CLOCK_LEVELS[l].icon} ${CLOCK_LEVELS[l].name}`, sub: CLOCK_LEVELS[l].desc
+        })), settings.clockLevel, v => { settings.clockLevel = v; saveSettings(); renderSetup(); });
+
+        renderChoices('clocktask-group', [
+            { val: 'read', label: '👀 Ablesen & antippen', sub: 'Welche Uhrzeit stimmt?' },
+            { val: 'write', label: '✏️ Ablesen & hinschreiben', sub: 'Uhrzeit eintippen' },
+            { val: 'set', label: '👆 Zeiger stellen', sub: 'Stell die Uhr selbst ein' },
+            { val: 'mixed', label: '🎲 Gemischt', sub: 'Alles durcheinander' }
+        ], settings.clockTask, v => { settings.clockTask = v; saveSettings(); renderSetup(); });
+
+        // Abschnitte durchnummerieren (nur die sichtbaren)
+        let secNo = 1;
+        document.querySelectorAll('#setup-screen .sec-title').forEach(el => {
+            if (el.closest('.setup-section').classList.contains('hidden')) return;
+            el.innerText = `${secNo++}. ${el.dataset.t}`;
+        });
+
         // Stufe: auf die höchste freie Stufe zurückfallen, falls gesperrt
         while (settings.level > 1 && !levelOpen(settings.level)) settings.level--;
         renderChoices('level-group', [1, 2, 3].map(l => ({
@@ -1527,7 +1710,9 @@
 
         renderChoices('timer-group', [
             { val: false, label: '😌 Ohne Timer', sub: 'In Ruhe nachdenken' },
-            { val: true, label: '⏱️ Mit Timer', sub: `Rechnen ${TIME_CALC} s · Text ${TIME_STORY} s` }
+            { val: true, label: '⏱️ Mit Timer', sub: isClock
+                ? `Antippen ${TIME_CLOCK_READ} s · sonst ${TIME_CLOCK_WORK} s`
+                : `Rechnen ${TIME_CALC} s · Text ${TIME_STORY} s` }
         ], settings.timer, v => { settings.timer = v; saveSettings(); renderSetup(); });
 
         renderChoices('answer-group', [
@@ -1765,6 +1950,242 @@
         tickTimer();
     }
 
+    // ================= Uhr-Training =================
+    const pad2 = n => String(n).padStart(2, '0');
+    const to12 = H => ((H % 12) + 11) % 12 + 1;          // 0 → 12, 13 → 1, 12 → 12
+    const timeKey = (H, m) => `${H}:${pad2(m)}`;
+    const spokenTime = (H, m) => m === 0 ? `${to12(H)} Uhr` : `halb ${to12(to12(H) + 1)}`;
+
+    function dayPart(H) {
+        if (H < 5) return { icon: '🌙', word: 'in der Nacht', acts: ['😴 Alle schlafen'] };
+        if (H < 11) return { icon: '🌅', word: 'in der Früh', acts: ['🥣 Frühstück', '🎒 Ab in die Schule', '🚌 Schulbus'] };
+        if (H < 14) return { icon: '☀️', word: 'zu Mittag', acts: ['🍝 Mittagessen', '🔔 Schulschluss'] };
+        if (H < 18) return { icon: '🌤️', word: 'am Nachmittag', acts: ['⚽ Fußballtraining', '🛝 Spielplatz', '📚 Hausübung'] };
+        if (H < 22) return { icon: '🌆', word: 'am Abend', acts: ['📺 Fußball im Fernsehen', '🍽️ Abendessen', '🛁 Baden'] };
+        return { icon: '🌙', word: 'in der Nacht', acts: ['😴 Alle schlafen'] };
+    }
+
+    function captainShort(pid) {
+        const full = captainName(pid);
+        const special = { 'Vinícius Júnior': 'Vinícius' };
+        return special[full] || full.split(' ').slice(-1)[0];
+    }
+
+    // Ziffernblatt in der Farbe des Kindes – "die Uhr von Messi"
+    function clockSVG(pid, interactive) {
+        const color = P(pid).color;
+        let ticks = '', nums = '', hits = '';
+        for (let i = 0; i < 60; i++) {
+            const a = i * 6 * Math.PI / 180, big = i % 5 === 0;
+            const r1 = big ? 71 : 75, r2 = 80;
+            ticks += `<line x1="${100 + r1 * Math.sin(a)}" y1="${100 - r1 * Math.cos(a)}" x2="${100 + r2 * Math.sin(a)}" y2="${100 - r2 * Math.cos(a)}" stroke="#37474f" stroke-width="${big ? 3 : 1}"/>`;
+        }
+        for (let n = 1; n <= 12; n++) {
+            const a = n * 30 * Math.PI / 180, x = 100 + 63 * Math.sin(a), y = 100 - 63 * Math.cos(a);
+            nums += `<text x="${x}" y="${y + 6}" font-size="17" font-weight="900" fill="#102027" text-anchor="middle" font-family="Verdana, sans-serif">${n}</text>`;
+            if (interactive) hits += `<circle class="hit" data-n="${n}" cx="${x}" cy="${y}" r="15"/>`;
+        }
+        return `<svg class="clock-svg" viewBox="0 0 200 200" aria-label="Uhr">
+            <defs><path id="ring-${pid}" d="M 6 100 A 94 94 0 0 0 194 100"/></defs>
+            <circle cx="100" cy="100" r="98" fill="${color}"/>
+            <circle cx="100" cy="100" r="83" fill="#fffde7" stroke="#fff" stroke-width="2"/>
+            <text font-size="11" font-weight="900" fill="#fff" font-family="Verdana, sans-serif" letter-spacing="2">
+                <textPath href="#ring-${pid}" startOffset="50%" text-anchor="middle">⚽ ${escapeHtml(captainShort(pid).toUpperCase())} ⚽</textPath>
+            </text>
+            ${ticks}${nums}
+            <g id="hand-h" class="hand"><line x1="100" y1="108" x2="100" y2="58" stroke="#1565c0" stroke-width="9" stroke-linecap="round"/></g>
+            <g id="hand-m" class="hand"><line x1="100" y1="112" x2="100" y2="28" stroke="#d50000" stroke-width="5" stroke-linecap="round"/></g>
+            <circle cx="100" cy="100" r="7" fill="#263238"/>
+            ${hits}
+        </svg>`;
+    }
+
+    function setHands(h, m) {
+        document.getElementById('hand-h').style.transform = `rotate(${((h % 12) + m / 60) * 30}deg)`;
+        document.getElementById('hand-m').style.transform = `rotate(${m * 6}deg)`;
+    }
+
+    let clockSet = { h: 12, m: 0, hand: 'h' };   // Zeiger-Stellung beim Selbst-Einstellen
+    let clockTyped = { h: '', m: '', field: 'h' };
+
+    function pickHand(hand) {
+        clockSet.hand = hand;
+        document.getElementById('pick-h').classList.toggle('active', hand === 'h');
+        document.getElementById('pick-m').classList.toggle('active', hand === 'm');
+    }
+
+    function clockTap(n) {
+        if (isLocked) return;
+        if (clockSet.hand === 'h') {
+            clockSet.h = n;
+            pickHand('m'); // danach gleich den großen Zeiger
+        } else {
+            clockSet.m = (n % 12) * 5;
+        }
+        setHands(clockSet.h, clockSet.m);
+    }
+
+    function generateClockQuestion() {
+        const pid = currentPid();
+        const L = game.level;
+        const variant = game.task === 'mixed' ? pick(['read', 'write', 'set']) : game.task;
+
+        let H, m;
+        if (L === 3) { H = randInt(1, 23); m = pick([0, 30]); }
+        else { H = randInt(1, 12); m = L === 1 ? 0 : pick([0, 30]); }
+
+        const part = dayPart(H);
+        const style = L === 3 ? 'digital24' : pick(['spoken', 'digital']);
+        const label = (h, mm) => style === 'spoken' ? spokenTime(h, mm)
+            : style === 'digital' ? `${to12(h)}:${pad2(mm)}` : `${pad2(h)}:${pad2(mm)}`;
+
+        q = { clock: true, variant, H, m, style, label };
+        if (L === 3) {
+            q.answer = timeKey(H, m);
+            q.answerText = `${pad2(H)}:${pad2(m)} (${spokenTime(H, m)} ${part.word})`;
+        } else {
+            q.answer = timeKey(to12(H), m);
+            q.answerText = `${spokenTime(H, m)} (${to12(H)}:${pad2(m)})`;
+        }
+        q.accept = new Set([q.answer]);
+        if (variant === 'set') {
+            // Auf der Zeiger-Uhr sind 7:30 und 19:30 dieselbe Stellung
+            q.accept = new Set([timeKey(to12(H), m)]);
+        }
+        if (L < 3 && variant === 'write') {
+            // Bei der normalen Uhr zählt auch die Nachmittags-Zeit (7:30 oder 19:30)
+            q.accept.add(timeKey((to12(H) + 12) % 24, m));
+        }
+
+        document.getElementById('clock-title').innerText = `⌚ Die Uhr von ${captainShort(pid)}`;
+        const ctx = document.getElementById('clock-context');
+        ctx.classList.toggle('hidden', L !== 3 || variant === 'set');
+        ctx.innerText = `${part.icon} ${part.word} – ${pick(part.acts)}`;
+
+        const interactive = variant === 'set';
+        document.getElementById('clock-face').innerHTML = clockSVG(pid, interactive);
+        document.getElementById('hand-pick').classList.toggle('hidden', !interactive);
+
+        const prompt = document.getElementById('clock-prompt');
+        if (variant === 'set') {
+            clockSet = { h: 12, m: 0, hand: 'h' };
+            pickHand('h');
+            const target = L === 3 ? `${pad2(H)}:${pad2(m)}` : label(H, m);
+            prompt.innerHTML = `Stell die Uhr auf <span class="num">${escapeHtml(target)}</span>`;
+            document.querySelectorAll('#clock-face .hit').forEach(c => { c.onclick = () => clockTap(parseInt(c.dataset.n, 10)); });
+            setHands(12, 0);
+        } else {
+            prompt.innerText = L === 3
+                ? (variant === 'read' ? 'Wie spät ist es? (24-Stunden-Zeit)' : 'Schreib die Uhrzeit als 24-Stunden-Zeit!')
+                : (variant === 'read' ? 'Wie spät ist es?' : 'Schreib die Uhrzeit auf!');
+            setHands(to12(H), m);
+        }
+
+        renderClockAnswers();
+    }
+
+    // Falsche Antworten = typische Fehler beim Uhr-Lesen
+    function clockOptions() {
+        const { H, m } = q;
+        const L = game.level;
+        let cands;
+        if (L < 3) {
+            const h = to12(H);
+            cands = [[h - 1, m], [h + 1, m], [12 - h, m], [h + 2, m]];
+            if (L === 2) cands.unshift(m === 30 ? [h - 1, 30] : [h, 30], [h, 30 - m]);  // "halb" falsch gedacht
+            cands = cands.map(([x, y]) => [to12(x), y]);
+        } else {
+            cands = [[(H + 12) % 24, m], [(H + 1) % 24, m], [(H + 23) % 24, m], [H, 30 - m], [(H + 12) % 24, 30 - m]];
+        }
+        const ans = q.answer;
+        const opts = [];
+        const add = ([x, y]) => {
+            const k = timeKey(x, y);
+            if (k !== ans && !opts.some(o => o.key === k)) opts.push({ key: k, text: q.label(x, y) });
+        };
+        add(cands[0]);
+        shuffle(cands.slice(1)).forEach(c => { if (opts.length < 3) add(c); });
+        while (opts.length < 3) add(L < 3 ? [randInt(1, 12), m] : [randInt(1, 23), m]);
+        const correctPair = L < 3 ? [to12(H), m] : [H, m];
+        return shuffle([{ key: ans, text: q.label(...correctPair) }, ...opts]);
+    }
+
+    function renderClockAnswers() {
+        const container = document.getElementById('answers-container');
+        container.innerHTML = '';
+
+        if (q.variant === 'set') {
+            const btn = document.createElement('button');
+            btn.className = 'done-btn';
+            btn.type = 'button';
+            btn.innerText = '✔ Fertig!';
+            btn.onclick = () => checkAnswer(timeKey(clockSet.h, clockSet.m), btn);
+            container.appendChild(btn);
+            return;
+        }
+
+        if (q.variant === 'write') {
+            clockTyped = { h: '', m: '', field: 'h' };
+            container.innerHTML = `
+                <div class="type-box">
+                    <div class="time-display">
+                        <span class="t-field active" id="t-h" onclick="clockField('h')"><span class="t-label">Stunden</span><span id="t-h-val">__</span></span>
+                        :
+                        <span class="t-field" id="t-m" onclick="clockField('m')"><span class="t-label">Minuten</span><span id="t-m-val">__</span></span>
+                    </div>
+                    <div class="keypad">
+                        ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(d => `<button class="key" type="button" data-key="${d}">${d}</button>`).join('')}
+                        <button class="key del" type="button" data-key="del">⌫</button>
+                        <button class="key" type="button" data-key="0">0</button>
+                        <button class="key del" type="button" data-key=":">:</button>
+                        <button class="key ok wide" type="button" data-key="ok">✔ Fertig</button>
+                    </div>
+                </div>`;
+            container.querySelectorAll('.key').forEach(k => { k.onclick = () => clockKey(k.dataset.key); });
+            return;
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'answers-grid clock-answers';
+        clockOptions().forEach(o => {
+            const btn = document.createElement('button');
+            btn.className = 'ans-btn';
+            btn.innerText = o.text;
+            btn.dataset.val = o.key;
+            btn.onclick = () => checkAnswer(o.key, btn);
+            grid.appendChild(btn);
+        });
+        container.appendChild(grid);
+    }
+
+    function clockField(field) {
+        if (isLocked) return;
+        clockTyped.field = field;
+        document.getElementById('t-h').classList.toggle('active', field === 'h');
+        document.getElementById('t-m').classList.toggle('active', field === 'm');
+    }
+
+    function clockKey(key) {
+        if (isLocked || !q || q.variant !== 'write') return;
+        const f = clockTyped.field;
+        if (key === 'ok') {
+            if (!clockTyped.h) { clockField('h'); return; }
+            const typedKey = timeKey(parseInt(clockTyped.h, 10), parseInt(clockTyped.m || '0', 10));
+            checkAnswer(typedKey, document.querySelector('.time-display'));
+            return;
+        }
+        if (key === ':') { clockField(f === 'h' ? 'm' : 'h'); return; }
+        if (key === 'del') {
+            if (!clockTyped[f] && f === 'm') { clockField('h'); clockTyped.h = clockTyped.h.slice(0, -1); }
+            else clockTyped[f] = clockTyped[f].slice(0, -1);
+        } else if (clockTyped[f].length < 2) {
+            clockTyped[f] += key;
+            if (f === 'h' && clockTyped.h.length === 2) clockField('m');
+        }
+        document.getElementById('t-h-val').innerText = clockTyped.h || '__';
+        document.getElementById('t-m-val').innerText = clockTyped.m || '__';
+    }
+
     // ================= Spiel =================
     let game = null;
     let q = null;          // aktuelle Aufgabe
@@ -1783,12 +2204,15 @@
             return;
         }
         if (!levelOpen(settings.level)) settings.level = 1;
+        const isClock = settings.game === 'clock';
+        document.body.classList.toggle('clock-game', isClock);
 
         game = {
+            kind: isClock ? 'clock' : 'math',
             players: sel.map(p => p.id),
-            level: settings.level,
+            level: isClock ? settings.clockLevel : settings.level,
             mode: sel.length === 1 ? 'solo' : settings.mode,
-            task: settings.task,
+            task: isClock ? settings.clockTask : settings.task,
             timer: !!settings.timer,
             answer: settings.answer,
             turn: 0,
@@ -1848,6 +2272,17 @@
         document.getElementById('feedback-text').innerText = '';
         if ('speechSynthesis' in window) speechSynthesis.cancel();
         resetPitch();
+
+        const clockBox = document.getElementById('clock-box');
+        if (game.kind === 'clock') {
+            ['question-text', 'story-box', 'review-tag'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            clockBox.classList.remove('hidden');
+            generateClockQuestion();
+            if (game.timer) startTimer(q.variant === 'read' ? TIME_CLOCK_READ : TIME_CLOCK_WORK);
+            else { stopTimer(); document.getElementById('timer').classList.add('hidden'); }
+            return;
+        }
+        clockBox.classList.add('hidden');
 
         const pid = currentPid();
         const kind = pickKind();
@@ -1973,6 +2408,22 @@
     // Eintippen auch mit der Tastatur (Computer)
     document.addEventListener('keydown', e => {
         if (!game || document.getElementById('game-screen').classList.contains('hidden')) return;
+        if (game.kind === 'clock') {
+            if (!q || !q.clock) return;
+            if (q.variant === 'write') {
+                if (/^[0-9]$/.test(e.key)) clockKey(e.key);
+                else if (e.key === ':' || e.key === '.' || e.key === 'Tab') { e.preventDefault(); clockKey(':'); }
+                else if (e.key === 'Backspace') clockKey('del');
+                else if (e.key === 'Enter') clockKey('ok');
+            } else if (q.variant === 'read' && /^[1-4]$/.test(e.key)) {
+                const btn = document.querySelectorAll('.ans-btn')[parseInt(e.key, 10) - 1];
+                if (btn) btn.click();
+            } else if (q.variant === 'set' && e.key === 'Enter') {
+                const done = document.querySelector('.done-btn');
+                if (done) done.click();
+            }
+            return;
+        }
         if (game.answer === 'type') {
             if (/^[0-9]$/.test(e.key)) pressKey(e.key);
             else if (e.key === 'Backspace') pressKey('del');
@@ -1993,10 +2444,12 @@
         const st = game.stats[pid];
         const name = P(pid).name;
         const feedback = document.getElementById('feedback-text');
-        const correct = selected === q.answer;
+        const correct = q.accept ? q.accept.has(String(selected)) : selected === q.answer;
+        const answerText = q.answerText || q.answer;
 
         st.asked++;
-        recordFact(pid, q.key, correct);
+        if (q.clock) recordClock(pid, correct);
+        else recordFact(pid, q.key, correct);
 
         if (correct) {
             st.correct++;
@@ -2024,11 +2477,13 @@
             shoot(false);
             Sound.miss();
             document.querySelectorAll('.ans-btn').forEach(b => {
-                if (parseInt(b.innerText, 10) === q.answer) b.classList.add('correct');
+                if (q.accept ? q.accept.has(b.dataset.val) : parseInt(b.innerText, 10) === q.answer) b.classList.add('correct');
             });
             feedback.innerText = timedOut
-                ? `⏰ Zeit abgelaufen! Richtig wäre ${q.answer} gewesen.`
-                : `Gehalten! Richtig wäre ${q.answer} gewesen. 🧤`;
+                ? `⏰ Zeit abgelaufen! Richtig wäre ${answerText} gewesen.`
+                : `Gehalten! Richtig wäre ${answerText} gewesen. 🧤`;
+            // Beim Zeiger-Stellen zeigt die Uhr danach die richtige Zeit
+            if (q.clock && q.variant === 'set') setHands(to12(q.H), q.m);
             feedback.style.color = '#ff8a80';
         }
 
@@ -2044,7 +2499,7 @@
         updateUI();
 
         // Bei Textaufgaben etwas länger warten, damit man Bild & Rechnung anschauen kann
-        const delay = q.story ? (correct ? 2500 : 3500) : (correct ? 1800 : 2300);
+        const delay = q.story ? (correct ? 2500 : 3500) : q.clock ? (correct ? 2000 : 3200) : (correct ? 1800 : 2300);
         setTimeout(() => {
             if (checkGameOver()) {
                 showEndScreen();
@@ -2099,9 +2554,22 @@
         banner.style.background = P(pid).color;
     }
 
+    function giveSticker(pid) {
+        const s = stickerCount(pid);
+        if (s >= STICKERS.length) return '';
+        progress[pid].s = s + 1;
+        return `<br><span class="sticker-msg">🎁 Neuer Sticker: ${STICKERS[s].e} ${STICKERS[s].n}</span>`;
+    }
+
     // Stern + Sticker vergeben und neue Stufen melden
     function awardStar(pid) {
         const lvl = game.level;
+        if (game.kind === 'clock') {
+            progress[pid] = progress[pid] || {};
+            progress[pid]['c' + lvl] = (progress[pid]['c' + lvl] || 0) + 1;
+            const msg = `⭐ Uhr: ${CLOCK_LEVELS[lvl].name} geschafft! (${progress[pid]['c' + lvl]}×)` + giveSticker(pid);
+            return { msg, unlocked: false };
+        }
         const before = lvl < 3 && isUnlocked(pid, lvl + 1);
         progress[pid] = progress[pid] || {};
         progress[pid][lvl] = wins(pid, lvl) + 1;
@@ -2117,11 +2585,7 @@
             msg += ` Noch ${WINS_TO_UNLOCK - w}× bis ${LEVELS[lvl + 1].name}.`;
         }
 
-        const s = stickerCount(pid);
-        if (s < STICKERS.length) {
-            progress[pid].s = s + 1;
-            msg += `<br><span class="sticker-msg">🎁 Neuer Sticker: ${STICKERS[s].e} ${STICKERS[s].n}</span>`;
-        }
+        msg += giveSticker(pid);
         return { msg, unlocked };
     }
 
@@ -2215,6 +2679,7 @@
 
     function resetToMenu() {
         stopTimer();
+        document.body.classList.remove('clock-game');
         if ('speechSynthesis' in window) speechSynthesis.cancel();
         document.getElementById('end-screen').classList.add('hidden');
         document.getElementById('game-screen').classList.add('hidden');

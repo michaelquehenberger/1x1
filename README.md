@@ -25,7 +25,8 @@ Auf Android: Link in Chrome öffnen → Menü ⋮ → **„App installieren“**
    - **📷 Foto:** Statt des Trikots kann ein eigenes Foto gewählt werden.
    - **📒 Album:** Zeigt die gesammelten Sticker.
    - **Kapitän:** Jedes Kind wählt seinen Lieblingsstar.
-2. **Schwierigkeitsstufe wählen:**
+2. **Was üben wir?** ⚽ 1x1-Training oder 🕐 [Uhr-Training](#-uhr-training).
+3. **Schwierigkeitsstufe wählen:**
 
    | Stufe | Einmaleins-Reihen | Freischalten |
    |---|---|---|
@@ -35,25 +36,45 @@ Auf Android: Link in Chrome öffnen → Menü ⋮ → **„App installieren“**
 
    **⭐ Geschafft** = mindestens 7 von 10 Aufgaben richtig (im Team-Pokal: ca. 7 von 10 Schüssen sind Tore, also z.B. 10 Tore in höchstens 15 Versuchen).
    Jedes Kind sammelt **eigene Sterne**. Spielen mehrere Kinder zusammen, ist eine Stufe nur wählbar, wenn **alle** sie schon freigespielt haben. Gesperrte Stufen zeigen 🔒 und wie viele Sterne noch fehlen.
-3. **Spielmodus wählen:**
+4. **Spielmodus wählen:**
    - 🎯 **Solo-Training** (1 Kind): 10 Schüsse – schaffst du 7?
    - ⚔️ **Elfmeter-Duell** (2–3 Kinder): Alle schießen abwechselnd, jedes Kind hat 10 Schüsse. Wer mehr Tore hat, gewinnt den Pokal.
    - 🤝 **Team-Pokal** (2–3 Kinder): Gemeinsam 5 Tore pro Kind schießen (2 Kinder = 10 Tore, 3 Kinder = 15 Tore).
-4. **Aufgabenart wählen:**
+5. **Aufgabenart wählen:**
    - ✖️ **Malnehmen:** z.B. `4 × 5 = ?`
    - ➗ **Teilen:** die Umkehraufgabe, z.B. `20 : 4 = ?`
    - 📖 **Textaufgaben:** kurze Fußball-Rechengeschichten zum Malnehmen und Teilen (Sticker, Fanbus, Torwand, Pizza nach dem Sieg …). Die Zahlen sind **gelb markiert**. Ein **Bild** zeigt die Aufgabe, z.B. 4 Kästchen mit je 5 ⚽. Beim Teilen liegt zuerst alles auf einem Haufen und wird nach der Antwort aufgeteilt. Mit **🔊 Vorlesen** liest der Browser die Geschichte vor. Danach erscheint die passende Rechnung (`📝 4 × 5 = 20`).
    - 🎲 **Gemischt:** alles durcheinander.
-5. **Zeit wählen:**
+6. **Zeit wählen:**
    - 😌 **Ohne Timer:** in Ruhe nachdenken.
    - ⏱️ **Mit Timer:** **10 Sekunden** für Rechenaufgaben, **15 Sekunden** für Textaufgaben. Ein Balken läuft ab und wird in den letzten 3 Sekunden rot (mit Ticken). Ist die Zeit um, zählt der Schuss als gehalten. **Während des Vorlesens bleibt der Timer stehen.**
-6. **Antworten wählen:**
+7. **Antworten wählen:**
    - 👆 **Auswählen:** 4 Antworten zur Wahl. Die falschen Antworten sind typische Fehler (Nachbarzahlen aus derselben Reihe) – Raten hilft nicht.
    - ⌨️ **Eintippen:** Zahlenfeld zum Eintippen – schwerer. Am Computer geht auch die Tastatur.
-7. **ANPFIFF!** drücken.
+8. **ANPFIFF!** drücken.
    - Richtig: Der Ball fliegt ins Tor, großes **TOOOR!**, Konfetti, Jubel. Mehrere Treffer hintereinander geben eine **🔥 Serie**.
    - Falsch: Der Tormann hält 🧤, die richtige Lösung wird angezeigt.
-8. Am Ende gibt es Sterne ⭐, einen **🎁 Sticker** fürs Album und evtl. eine neu freigeschaltete Stufe 🔓.
+9. Am Ende gibt es Sterne ⭐, einen **🎁 Sticker** fürs Album und evtl. eine neu freigeschaltete Stufe 🔓.
+
+## 🕐 Uhr-Training
+
+Im Startbildschirm bei **„Was üben wir?“** auf **🕐 Uhr-Training** tippen. Das Ziffernblatt ist die **„Uhr von Messi“, „Uhr von Ronaldo“** usw. – in der Farbe des Kindes und mit dem Namen seines Kapitäns. Der kleine Zeiger (Stunden) ist **blau**, der große Zeiger (Minuten) **rot**.
+
+**Uhr-Stufen:**
+
+| Stufe | Was geübt wird |
+|---|---|
+| 🕐 Volle Stunden | 7 Uhr, 3 Uhr … |
+| 🕧 Halbe Stunden | dazu halb 8, halb 4 … |
+| 🌙 24-Stunden-Uhr | 7:00 in der Früh oder 19:00 am Abend – mit Hinweis auf die Tageszeit (🌅 früh, ☀️ Mittag, 🌤️ Nachmittag, 🌆 Abend, 🌙 Nacht) |
+
+**Uhr-Aufgaben:**
+- 👀 **Ablesen & antippen:** Die Uhr zeigt eine Zeit, aus 4 Antworten die richtige wählen (z.B. „halb 8“ oder „7:30“, bei der 24-Stunden-Uhr „19:30“). Die falschen Antworten sind typische Fehler, z.B. „halb 7“ statt „halb 8“ oder 07:30 statt 19:30.
+- ✏️ **Ablesen & hinschreiben:** Die Uhrzeit mit dem Zahlenfeld eintippen (Stunden : Minuten). Bei der normalen Uhr zählt 7:30 und 19:30.
+- 👆 **Zeiger stellen:** Die Uhr selbst einstellen – erst den kleinen Zeiger, dann den großen Zeiger auf eine Zahl tippen, dann **✔ Fertig**. Bei einem Fehler springt die Uhr auf die richtige Zeit.
+- 🎲 **Gemischt:** alles durcheinander.
+
+Spielmodi, Timer (Antippen 10 s, Hinschreiben/Stellen 15 s), Torjubel, Sterne und Sticker funktionieren wie beim 1x1. Uhr-Sterne erscheinen als 🕐 auf der Spielerkarte, im Eltern-Bereich steht die Trefferquote bei der Uhr.
 
 **🔁 Knifflige Aufgaben kommen wieder:** Was ein Kind falsch beantwortet, kommt in den nächsten Spielen öfter dran (markiert mit „🔁 Übungsaufgabe“), bis es zweimal richtig gelöst wurde.
 
@@ -86,6 +107,7 @@ Das Spiel steckt in [`index.html`](index.html):
 - **Kinder, Farben, Nummern & Fußballstars:** in der Liste `PLAYERS`.
 - **Textaufgaben:** in `MUL_STORIES` (Malnehmen) und `DIV_STORIES` (Teilen) neue Geschichten ergänzen.
 - **Sticker:** in der Liste `STICKERS`.
+- **Uhr:** Stufen in `CLOCK_LEVELS`, Tageszeiten und Aktivitäten in `dayPart()`, Timer in `TIME_CLOCK_READ` / `TIME_CLOCK_WORK`.
 - **Reihen pro Stufe:** in der Funktion `getAllowedTables()`.
 - **Regeln:** `WINS_TO_UNLOCK` (Sterne bis zur nächsten Stufe, Standard 2), `PASS_CORRECT` (richtige Antworten für einen Stern, Standard 7), `SHOTS_PER_PLAYER` (Standard 10), `COOP_GOALS_PER_PLAYER` (Standard 5), `TIME_CALC` / `TIME_STORY` (Timer-Sekunden, Standard 10 / 15), `REVIEW_CHANCE` (wie oft knifflige Aufgaben wiederkommen, Standard 40 %).
 
