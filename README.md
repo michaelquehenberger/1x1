@@ -18,6 +18,12 @@ Das Spiel läuft direkt im Browser, auf PC, Tablet und Handy. Man braucht keine 
 
 Auf Android: Link in Chrome öffnen → Menü ⋮ → **„App installieren“** bzw. **„Zum Startbildschirm hinzufügen“**.
 
+## 🎨 Design
+
+Farben, Schrift, Rundungen und Abstände folgen dem Design System **„HIG Stil“** (inoffiziell nach den Apple Human Interface Guidelines): neutrale Flächen, **Blau** als Akzent für alles Antippbare, **Grün / Rot / Orange** nur für Zustände (richtig, falsch, Warnung), Systemschrift (SF Pro auf Apple-Geräten). Hell- und Dunkelmodus werden automatisch nach der Geräteeinstellung gewählt. Alle Texte erreichen in beiden Modi die empfohlenen Kontraste.
+
+Die Farbwerte stehen gesammelt am Anfang von [`index.html`](index.html) im Block `:root` (Dunkelmodus darunter).
+
 ## 🎮 So wird gespielt
 
 1. **Wer spielt mit?** Ilian 🔵, Johan 🔴 und/oder Helena 🟣 mit **➕ Mitspielen** auswählen. Es können 1, 2 oder alle 3 Kinder spielen.
