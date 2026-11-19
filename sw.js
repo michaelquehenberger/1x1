@@ -1,7 +1,7 @@
 // Offline-Unterstützung für die 1x1 Champions Arena.
 // Immer zuerst aus dem Internet laden (damit Updates sofort ankommen),
 // ohne Internet die zuletzt gespeicherte Version verwenden.
-const CACHE = 'arena-v2';
+const CACHE = 'arena-v3';
 const FILES = [
     './',
     './index.html',
