@@ -483,6 +483,51 @@
 
         .choice-btn.shake { animation: shake 0.4s; }
 
+        /* Eigene Malreihen */
+        .table-picker {
+            background: var(--inner);
+            border-radius: var(--radius-lg);
+            padding: 12px;
+            margin: 4px 0 8px 0;
+        }
+
+        .chips {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+            gap: 8px;
+        }
+
+        .chip {
+            min-width: 60px;
+            min-height: 44px;
+            background: var(--raised);
+            color: var(--label);
+            font-size: 19px;
+            font-weight: 700;
+            border-radius: var(--radius-pill);
+            padding: 8px 14px;
+        }
+
+        .chip.on {
+            box-shadow: inset 0 0 0 3px var(--blue), var(--shadow-card);
+        }
+
+        .chip.on::before { content: "✓ "; color: var(--blue-accessible); }
+
+        .chip-actions { margin-top: 10px; }
+
+        .chip-actions button {
+            font-size: 15px;
+            padding: 6px 14px;
+            min-height: 36px;
+            background: var(--card);
+            color: var(--blue-accessible);
+            border-radius: var(--radius-pill);
+            margin: 0 4px;
+        }
+
+        .table-picker .rule-hint { margin-top: 10px; }
+
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-8px); }
@@ -1174,6 +1219,14 @@
         <div class="setup-section math-only">
             <strong class="sec-title" data-t="Schwierigkeitsstufe:"></strong>
             <div class="choice-group" id="level-group"></div>
+            <div class="table-picker hidden" id="table-picker">
+                <div class="chips" id="table-chips"></div>
+                <div class="chip-actions">
+                    <button type="button" onclick="setTables([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])">Alle</button>
+                    <button type="button" onclick="setTables([2, 5, 10])">Kernreihen 2 · 5 · 10</button>
+                </div>
+                <div class="rule-hint">🎯 Training mit eigenen Reihen: zählt für die Übersicht, bringt aber keine Sterne. Sterne gibt es in den Stufen Rookie, Profi und Weltmeister.</div>
+            </div>
             <div class="rule-hint">⭐ Geschafft = mindestens 7 von 10 richtig. 2 Sterne → nächste Stufe wird frei! Jeder Stern bringt einen Sticker fürs Album.</div>
         </div>
 
@@ -1378,7 +1431,7 @@
     let stats = load('arena-stats', {});         // { ilian: { f: { "3x7": {r, w} }, r: { "3x7": 2 } } }
     let settings = Object.assign(
         { selected: ['ilian', 'johan'], captains: {}, numbers: {}, level: 1, mode: 'versus',
-          task: 'calc', timer: false, answer: 'choice', sound: true,
+          task: 'calc', timer: false, answer: 'choice', sound: true, tables: [2, 5, 10],
           game: 'math', clockLevel: 1, clockTask: 'read' },
         load('arena-settings', {})
     );
@@ -1392,7 +1445,7 @@
     const wins = (pid, lvl) => (progress[pid] && progress[pid][lvl]) || 0;
     const stickerCount = pid => (progress[pid] && progress[pid].s) || 0;
     const isUnlocked = (pid, lvl) => lvl === 1 || wins(pid, lvl - 1) >= WINS_TO_UNLOCK;
-    const levelOpen = lvl => selectedPlayers().every(p => isUnlocked(p.id, lvl));
+    const levelOpen = lvl => lvl === 'custom' || selectedPlayers().every(p => isUnlocked(p.id, lvl));
     const pick = arr => arr[Math.floor(Math.random() * arr.length)];
     const randInt = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
     const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -1789,7 +1842,12 @@
             label: `${LEVELS[l].icon} ${LEVELS[l].name}`,
             sub: levelOpen(l) ? LEVELS[l].desc : lockHint(l),
             locked: !levelOpen(l)
-        })), settings.level, v => { settings.level = v; saveSettings(); renderSetup(); });
+        })).concat([{
+            val: 'custom',
+            label: '🎯 Eigene Reihen',
+            sub: settings.level === 'custom' ? tablesText(settings.tables) : 'Selbst auswählen'
+        }]), settings.level, v => { settings.level = v; saveSettings(); renderSetup(); });
+        renderTablePicker();
 
         // Modus abhängig von der Anzahl der Kinder
         const n = selectedPlayers().length;
@@ -1826,6 +1884,42 @@
         ], settings.answer, v => { settings.answer = v; saveSettings(); renderSetup(); });
 
         renderParentStats();
+    }
+
+    // ----- Eigene Malreihen -----
+    const tablesText = list => list.length === 10 ? 'Alle Reihen' : list.map(t => t + 'er').join(', ');
+
+    function renderTablePicker() {
+        const box = document.getElementById('table-picker');
+        box.classList.toggle('hidden', settings.level !== 'custom');
+        if (!Array.isArray(settings.tables) || !settings.tables.length) settings.tables = [2, 5, 10];
+        const chips = document.getElementById('table-chips');
+        chips.innerHTML = '';
+        for (let t = 1; t <= 10; t++) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'chip' + (settings.tables.includes(t) ? ' on' : '');
+            b.dataset.t = t;
+            b.innerText = t + 'er';
+            b.onclick = () => toggleTable(t);
+            chips.appendChild(b);
+        }
+    }
+
+    function toggleTable(t) {
+        const has = settings.tables.includes(t);
+        if (has && settings.tables.length === 1) {
+            showSetupError('Mindestens eine Reihe muss ausgewählt sein.');
+            return;
+        }
+        showSetupError('');
+        setTables(has ? settings.tables.filter(x => x !== t) : settings.tables.concat(t));
+    }
+
+    function setTables(list) {
+        settings.tables = list.slice().sort((a, b) => a - b);
+        saveSettings();
+        renderSetup();
     }
 
     function unlockAll() {
@@ -2316,6 +2410,7 @@
             kind: isClock ? 'clock' : 'math',
             players: sel.map(p => p.id),
             level: isClock ? settings.clockLevel : settings.level,
+            tables: settings.tables.slice(),
             mode: sel.length === 1 ? 'solo' : settings.mode,
             task: isClock ? settings.clockTask : settings.task,
             timer: !!settings.timer,
@@ -2338,6 +2433,7 @@
 
     function getAllowedTables() {
         // Typischer Stoff der 2. Klasse Volksschule Österreich
+        if (game.level === 'custom') return game.tables;
         if (game.level === 1) return [1, 2, 5, 10];
         if (game.level === 2) return [1, 2, 3, 4, 5, 10];
         return [2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -2396,7 +2492,8 @@
         const isStory = kind === 'story';
 
         // Bei Textaufgaben ohne "× 1" – die Geschichten sollen echte Gruppen zeigen
-        const allowed = getAllowedTables().filter(t => !isStory || t !== 1);
+        let allowed = getAllowedTables().filter(t => !isStory || t !== 1);
+        if (!allowed.length) allowed = getAllowedTables(); // nur 1er gewählt
 
         // Knifflige Aufgaben kommen öfter wieder
         let table, mult, fromReview = false;
@@ -2671,6 +2768,9 @@
     // Stern + Sticker vergeben und neue Stufen melden
     function awardStar(pid) {
         const lvl = game.level;
+        if (lvl === 'custom') {
+            return { msg: `🎯 Training geschafft! (${tablesText(game.tables)})`, unlocked: false };
+        }
         if (game.kind === 'clock') {
             progress[pid] = progress[pid] || {};
             progress[pid]['c' + lvl] = (progress[pid]['c' + lvl] || 0) + 1;

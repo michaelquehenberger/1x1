@@ -39,6 +39,9 @@ Die Farbwerte stehen gesammelt am Anfang von [`index.html`](index.html) im Block
    | 🥉 Rookie | 1er, 2er, 5er, 10er | von Anfang an offen |
    | 🥈 Profi | 1er, 2er, 3er, 4er, 5er, 10er | 2× Rookie geschafft |
    | 🥇 Weltmeister | 2er bis 10er (alle Reihen) | 2× Profi geschafft |
+   | 🎯 Eigene Reihen | selbst auswählen, z.B. nur 7er und 8er | immer offen – Training ohne Sterne |
+
+   **🎯 Eigene Reihen:** Die gewünschten Malreihen (1er bis 10er) antippen, mit **Alle** oder **Kernreihen 2 · 5 · 10** geht es schneller. Gilt für Malnehmen, Teilen und Textaufgaben. Das ist reines Training: Es zählt für die Übersicht im Eltern-Bereich und die Übungsliste, bringt aber keine Sterne – damit die Stufen weiterhin fair freigespielt werden.
 
    **⭐ Geschafft** = mindestens 7 von 10 Aufgaben richtig (im Team-Pokal: ca. 7 von 10 Schüssen sind Tore, also z.B. 10 Tore in höchstens 15 Versuchen).
    Jedes Kind sammelt **eigene Sterne**. Spielen mehrere Kinder zusammen, ist eine Stufe nur wählbar, wenn **alle** sie schon freigespielt haben. Gesperrte Stufen zeigen 🔒 und wie viele Sterne noch fehlen.
