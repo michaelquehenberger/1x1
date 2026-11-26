@@ -1265,6 +1265,7 @@
             <div class="parent-buttons">
                 <button type="button" onclick="unlockAll()">🔓 Alle Stufen freischalten</button>
                 <button type="button" onclick="resetProgress()">🗑️ Fortschritt zurücksetzen</button>
+                <button type="button" onclick="reloadFresh()">🔄 Neueste Version laden</button>
             </div>
         </details>
     </div>
@@ -1369,7 +1370,24 @@
     </div>
 </div>
 
+<div id="error-box" class="modal hidden">
+    <div class="modal-box">
+        <h2>Hoppla, da ist etwas schiefgelaufen</h2>
+        <p style="margin: 0 0 16px 0;">Mit dem Knopf unten lädt das Spiel neu. Sterne, Fotos und Sticker bleiben erhalten.</p>
+        <button class="start-btn" type="button" onclick="reloadFresh()">🔄 Neu laden</button>
+        <p class="rule-hint" id="error-text" style="margin-top: 16px; user-select: text; -webkit-user-select: text;"></p>
+    </div>
+</div>
+
 <script>
+    // Unerwartete Fehler anzeigen, damit das Spiel nie einfach "hängt"
+    window.addEventListener('error', e => {
+        const box = document.getElementById('error-box');
+        if (!box) return;
+        document.getElementById('error-text').innerText = 'Technischer Hinweis: ' + (e.message || 'unbekannter Fehler');
+        box.classList.remove('hidden');
+    });
+
     // ================= Einstellungen =================
     const PLAYERS = [
         { id: 'ilian', name: 'Ilian', color: '#007aff', dot: '🔵', number: 10,
@@ -1427,15 +1445,38 @@
         try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; }
     }
 
-    let progress = load('arena-progress', {});   // { ilian: { 1: 2, 2: 0, s: 3 } }  s = Sticker
-    let stats = load('arena-stats', {});         // { ilian: { f: { "3x7": {r, w} }, r: { "3x7": 2 } } }
+    // Nur echte Objekte übernehmen – beschädigte Daten werden ignoriert
+    const isObj = v => v !== null && typeof v === 'object' && !Array.isArray(v);
+    const loadObj = key => { const v = load(key, {}); return isObj(v) ? v : {}; };
+
+    let progress = loadObj('arena-progress');   // { ilian: { 1: 2, 2: 0, s: 3 } }  s = Sticker
+    let stats = loadObj('arena-stats');         // { ilian: { f: { "3x7": {r, w} }, r: { "3x7": 2 } } }
+    Object.keys(stats).forEach(pid => {
+        if (!isObj(stats[pid])) { delete stats[pid]; return; }
+        if (!isObj(stats[pid].f)) stats[pid].f = {};
+        if (!isObj(stats[pid].r)) stats[pid].r = {};
+    });
     let settings = Object.assign(
         { selected: ['ilian', 'johan'], captains: {}, numbers: {}, level: 1, mode: 'versus',
           task: 'calc', timer: false, answer: 'choice', sound: true, tables: [2, 5, 10],
           game: 'math', clockLevel: 1, clockTask: 'read' },
-        load('arena-settings', {})
+        loadObj('arena-settings')
     );
-    settings.numbers = settings.numbers || {};
+    // Einstellungen prüfen, damit ein alter oder beschädigter Stand den Start nie blockiert
+    if (!isObj(settings.numbers)) settings.numbers = {};
+    if (!isObj(settings.captains)) settings.captains = {};
+    if (!Array.isArray(settings.selected)) settings.selected = ['ilian', 'johan'];
+    settings.selected = settings.selected.filter(id => PLAYERS.some(p => p.id === id));
+    if (!Array.isArray(settings.tables) || !settings.tables.length) settings.tables = [2, 5, 10];
+    settings.tables = settings.tables.filter(t => Number.isInteger(t) && t >= 1 && t <= 10);
+    if (!settings.tables.length) settings.tables = [2, 5, 10];
+    if (![1, 2, 3, 'custom'].includes(settings.level)) settings.level = 1;
+    if (![1, 2, 3].includes(settings.clockLevel)) settings.clockLevel = 1;
+    if (!['calc', 'div', 'story', 'mixed'].includes(settings.task)) settings.task = 'calc';
+    if (!['read', 'write', 'set', 'mixed'].includes(settings.clockTask)) settings.clockTask = 'read';
+    if (!['math', 'clock'].includes(settings.game)) settings.game = 'math';
+    if (!['choice', 'type'].includes(settings.answer)) settings.answer = 'choice';
+    if (!['solo', 'versus', 'coop'].includes(settings.mode)) settings.mode = 'versus';
     const photos = {};
     PLAYERS.forEach(p => { const ph = load('arena-photo-' + p.id, null); if (ph) photos[p.id] = ph; });
 
@@ -2898,7 +2939,34 @@
 
     // Offline-Unterstützung (nur wenn über eine Webseite geöffnet, nicht als Datei)
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-        navigator.serviceWorker.register('sw.js').catch(() => {});
+        const hadController = !!navigator.serviceWorker.controller;
+        navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+            .then(reg => reg.update())
+            .catch(() => {});
+        // Kommt eine neue Version an, einmal neu laden – aber nie mitten im Spiel
+        let reloaded = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!hadController || reloaded) return;
+            const inGame = !document.getElementById('game-screen').classList.contains('hidden');
+            if (inGame) return;
+            reloaded = true;
+            location.reload();
+        });
+    }
+
+    // Offline-Speicher leeren und neu laden (Sterne, Fotos & Einstellungen bleiben erhalten)
+    async function reloadFresh() {
+        try {
+            if ('serviceWorker' in navigator) {
+                const regs = await navigator.serviceWorker.getRegistrations();
+                await Promise.all(regs.map(r => r.unregister()));
+            }
+            if (window.caches) {
+                const keys = await caches.keys();
+                await Promise.all(keys.map(k => caches.delete(k)));
+            }
+        } catch (e) {}
+        location.replace(location.pathname + '?v=' + Date.now());
     }
 </script>
 

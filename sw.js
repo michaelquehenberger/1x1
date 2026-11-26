@@ -1,7 +1,7 @@
 // Offline-Unterstützung für die 1x1 Champions Arena.
 // Immer zuerst aus dem Internet laden (damit Updates sofort ankommen),
 // ohne Internet die zuletzt gespeicherte Version verwenden.
-const CACHE = 'arena-v5';
+const CACHE = 'arena-v6';
 const FILES = [
     './',
     './index.html',
@@ -28,7 +28,8 @@ self.addEventListener('fetch', event => {
     const req = event.request;
     if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
     event.respondWith(
-        fetch(req)
+        // "no-store": am Server immer die neueste Fassung holen, nicht aus dem Browser-Zwischenspeicher
+        fetch(new Request(req.url, { cache: 'no-store', credentials: 'same-origin' }))
             .then(res => {
                 if (res.ok) {
                     const copy = res.clone();
