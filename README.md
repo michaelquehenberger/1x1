@@ -99,6 +99,7 @@ Ganz unten im Startbildschirm:
 - **Übersicht pro Kind:** Wie viel Prozent jeder 1x1-Reihe richtig gelöst wurden (🟢 sitzt, 🟡 fast, 🔴 üben) und welche Aufgaben gerade geübt werden.
 - **🔓 Alle Stufen freischalten** – z.B. wenn ein Kind schon alles kann.
 - **🗑️ Fortschritt zurücksetzen** – löscht Sterne, Sticker und Statistik.
+- **🔄 Neueste Version laden** – leert den Offline-Speicher und lädt das Spiel neu (Sterne, Fotos und Sticker bleiben erhalten). Hilfreich, falls das Spiel hängt oder eine ältere Version zeigt.
 
 ## 🌐 Online stellen (GitHub Pages)
 
